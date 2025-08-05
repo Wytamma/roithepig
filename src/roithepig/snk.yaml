@@ -31,10 +31,6 @@ cli:
     type: int
     help: Size of the square box to crop around the body part.
     default: 50
-  # output_dir:
-  #   type: path
-  #   help: Directory to save the processed video.
-  #   default: "output"
   batch_size:
     type: int
     help: Number of frames to process in a single batch.
