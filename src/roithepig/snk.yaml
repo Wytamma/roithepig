@@ -35,6 +35,10 @@ cli:
   #   type: path
   #   help: Directory to save the processed video.
   #   default: "output"
+  batch-size:
+    type: int
+    help: Number of frames to process in a single batch.
+    default: 2
   debug:
     type: bool
     help: Enable debug mode instead of cropping to roi.

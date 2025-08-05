@@ -86,6 +86,7 @@ rule deeplabcut:
         output_dir = OUT_DIR / VIDEO_NAME,
         dlc_csv_filtered = temp(str(POSE_OUTPUT) + "_filtered.csv"),  # filtered CSV
         cropping  = f"--cropping {config['cropping']}" if config['cropping'] else "",
+        batch_size = config.get("batch-size", 2),  # number of frames to process in a single batch
     shell:
         r"""
         set -euo pipefail
@@ -93,6 +94,7 @@ rule deeplabcut:
             --video "{input.video}" \
             --config "{input.config}" \
             --output-dir "{params.output_dir}" \
+            --batch-size {params.batch_size} \
             {params.cropping}
         # Move the filtered DLC CSV to our temp downscaled CSV path
         mv "{params.dlc_csv_filtered}" "{output.csv}"
