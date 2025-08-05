@@ -1,0 +1,41 @@
+cli:
+  video:
+    type: path
+    help: Path to the video file to be processed.
+    required: true
+  bodypart:
+    type: str
+    help: Body part to focus on for cropping.
+    default: "L ear base"
+  threshold:
+    type: float
+    help: Minimum likelihood threshold for body part detection.
+    default: 0.6
+  downscale_factor: 
+    type: float
+    help: Factor to downscale the video for processing.
+    default: 1.0
+  min_frames:
+    type: int
+    help: Minimum number of frames to create a valid segment.
+    default: 30
+  include_gap:
+    type: int
+    help: Merge runs separated by <= this many low-likelihood frames.
+    default: 1
+  cropping:
+    type: str
+    help: Optional cropping coordinates in the format "x1,x2,y1,y2".
+    default: None
+  box:
+    type: int
+    help: Size of the square box to crop around the body part.
+    default: 50
+  # output_dir:
+  #   type: path
+  #   help: Directory to save the processed video.
+  #   default: "output"
+  debug:
+    type: bool
+    help: Enable debug mode instead of cropping to roi.
+    default: false

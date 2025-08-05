@@ -1,0 +1,171 @@
+from pathlib import Path
+
+WORKFLOW_DIR = Path(workflow.snakefile).parent
+SCRIPT_DIR   = WORKFLOW_DIR / "scripts"
+ENV_DIR      = WORKFLOW_DIR / "envs"
+RULES_DIR    = WORKFLOW_DIR / "rules"
+NOTEBOOK_DIR = WORKFLOW_DIR / "notebooks"
+MODELS_DIR   = WORKFLOW_DIR / "models"
+
+OUT_DIR    = Path(config.get("output_dir", "output"))
+VIDEO_PATH = Path(config["video"])
+VIDEO_NAME = VIDEO_PATH.stem
+POSE_OUTPUT = OUT_DIR / VIDEO_NAME / f"{VIDEO_NAME}.dsDLC_Resnet50_pigs-heart-rateMay12shuffle1_snapshot_best-110"
+
+DOWNSCALE = float(config.get("downscale_factor", 1.0))
+SCALED_VIDEO = OUT_DIR / VIDEO_NAME / f"{VIDEO_NAME}.ds.mp4"
+DLC_CSV_DOWNSCALED = OUT_DIR / VIDEO_NAME / f"{VIDEO_NAME}.downscaled.csv"  # temp
+DLC_CSV_RESCALED   = OUT_DIR / VIDEO_NAME / f"{VIDEO_NAME}.csv"             # final
+
+# if DOWNSCALE < 1.0 and DOWNSCALE > 0:
+#     if config.get("cropping"):
+#         config["cropping"] = ",".join(DOWNSCALE * int(c) for c in config["cropping"].split(','))
+
+print(config)
+
+rule all:
+    """Run all steps in the workflow"""
+    input:
+        OUT_DIR / VIDEO_NAME / "segment_grid.mp4"
+
+rule update_config:
+    input:
+        config = MODELS_DIR / "head" / "config.yaml",
+    output:
+        config = temp(MODELS_DIR / "head" / "config.updated.yaml"),
+    shell:
+        """
+        python {SCRIPT_DIR}/update_config.py --config-path "{input.config}"
+        """
+
+rule downscale_video:
+    """Downscale the input video with ffmpeg for faster DLC inference"""
+    # You can put ffmpeg in an env if needed, or rely on system ffmpeg.
+    input:
+        video = Path(config["video"]).resolve(),
+    output:
+        video = SCALED_VIDEO,
+    params:
+        factor = DOWNSCALE,
+    shell:
+        r"""
+        set -euo pipefail
+        mkdir -p "$(dirname "{output.video}")"
+        if python - <<'PY'
+f = float("{params.factor}")
+assert f > 0 and f <= 1.0
+PY
+        then
+            if [ "{params.factor}" = "1.0" ]; then
+                # No scaling requested. Make a lightweight copy so downstream rules have a file to depend on.
+                ln -sf "{input.video}" "{output.video}"
+            else
+                ffmpeg -y -i "{input.video}" -vf "scale=iw*{params.factor}:ih*{params.factor}:flags=area" -c:v libx264 -crf 23 -preset veryfast -an -pix_fmt yuv420p "{output.video}"
+            fi
+        else
+            echo "downscale_factor must be in (0,1]; got {params.factor}" >&2
+            exit 1
+        fi
+        """
+
+rule deeplabcut:
+    """Run analysis on the downscaled video"""
+    conda: "envs/deeplabcut.yaml"
+    envmodules: "CUDA/11.7.0"
+    input:
+        video  = rules.downscale_video.output.video,
+        config = rules.update_config.output.config,
+    output:
+        csv = temp(DLC_CSV_DOWNSCALED),
+        dlc_csv    = temp(str(POSE_OUTPUT) + ".csv"),
+        dlc_full_pickle = temp(str(POSE_OUTPUT) + "_full.pickle"),
+        dld_meta_pickle = temp(str(POSE_OUTPUT) + "_meta.pickle"),
+        dlc_h5 = temp(str(POSE_OUTPUT) + ".h5"),  # DLC HDF5 file
+        dlc_h5_filtered = temp(str(POSE_OUTPUT) + "_filtered.h5"),  # filtered HDF5 file
+    params:
+        output_dir = OUT_DIR / VIDEO_NAME,
+        dlc_csv_filtered = temp(str(POSE_OUTPUT) + "_filtered.csv"),  # filtered CSV
+        cropping  = f"--cropping {config['cropping']}" if config['cropping'] else "",
+    shell:
+        r"""
+        set -euo pipefail
+        python "{SCRIPT_DIR}/run_deeplabcut.py" \
+            --video "{input.video}" \
+            --config "{input.config}" \
+            --output-dir "{params.output_dir}" \
+            {params.cropping}
+        # Move the filtered DLC CSV to our temp downscaled CSV path
+        mv "{params.dlc_csv_filtered}" "{output.csv}"
+        """
+
+rule upscale_dlc_csv:
+    """Rescale DLC keypoints back to original resolution"""
+    conda: "envs/deeplabcut.yaml"
+    input:
+        csv_down = rules.deeplabcut.output.csv,
+    output:
+        csv_full = DLC_CSV_RESCALED,
+    params:
+        sx = (1.0 / DOWNSCALE) if DOWNSCALE > 0 else 1.0,
+        sy = (1.0 / DOWNSCALE) if DOWNSCALE > 0 else 1.0,
+        cropping  = f"--cropping {config['cropping']}" if config['cropping'] else "",
+    shell:
+        """
+        python "{SCRIPT_DIR}/scale_dlc_csv.py" \
+            --in "{input.csv_down}" \
+            --out "{output.csv_full}" \
+            --sx {params.sx} \
+            --sy {params.sy} \
+            {params.cropping}
+        """
+
+rule crop_and_split:
+    """Crop and split the video into segments based on detected ear positions"""
+    conda: "envs/deeplabcut.yaml"
+    input:
+        csv   = rules.upscale_dlc_csv.output.csv_full,   # use rescaled CSV
+        video = config["video"],                          # original video for cropping
+    output:
+        out_dir = directory(OUT_DIR / VIDEO_NAME / "segments"),
+    params:
+        bodypart   = config.get("bodypart"),
+        threshold  = config.get("threshold", 0.6),
+        min_frames = config.get("min_frames", 30),
+        include_gap= config.get("include_gap", 1),
+        box        = config.get("box", 50),  # size of the crop box around the detected body part
+        debug      = "--debug-roi" if config.get("debug", False) else "",
+    shell:
+        r"""
+        python "{SCRIPT_DIR}/crop_and_split.py" \
+            --csv "{input.csv}" \
+            --video "{input.video}" \
+            --out "{output.out_dir}" \
+            --bodypart "{params.bodypart}" \
+            --threshold {params.threshold} \
+            --min-frames {params.min_frames} \
+            --include-gap {params.include_gap} \
+            {params.debug} \
+            --box {params.box} \
+            --crop
+        """
+
+rule create_segment_grid:
+    """Create a grid of segments for visualization"""
+    conda: "envs/deeplabcut.yaml"
+    input:
+        segments = rules.crop_and_split.output.out_dir,
+    output:
+        grid = OUT_DIR / VIDEO_NAME / "segment_grid.mp4",
+    params:
+        cell="320x320",
+        fps=30,
+        cols=0,   # 0 means auto
+    shell:
+        r"""
+        python "{SCRIPT_DIR}/create_segment_grid.py" \
+            --segments "{input.segments}" \
+            --out "{output.grid}" \
+            --cell {params.cell} \
+            --fps {params.fps} \
+            --cols {params.cols}
+        """

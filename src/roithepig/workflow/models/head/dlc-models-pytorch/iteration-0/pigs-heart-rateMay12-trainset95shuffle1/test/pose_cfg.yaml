@@ -1,0 +1,14 @@
+dataset: /content/drive/My Drive/pigs-heart-rate-dlc-2025-05-12
+dataset_type: multi-animal-imgaug
+num_joints: 3
+all_joints:
+- - 0
+- - 1
+- - 2
+all_joints_names:
+- L ear base
+- R ear base
+- Mid snout
+net_type: resnet_50
+global_scale: 1
+scoremap_dir: test
