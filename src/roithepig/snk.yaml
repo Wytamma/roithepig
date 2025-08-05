@@ -39,3 +39,7 @@ cli:
     type: bool
     help: Enable debug mode instead of cropping to roi.
     default: false
+  output_dir:
+    type: path
+    help: Directory to save the processed video.
+    default: "output"
