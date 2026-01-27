@@ -67,7 +67,11 @@ def main():
     if out_fps <= 0:
         raise ValueError("--fps must be > 0")
 
-    files = list_segment_files(seg_dir)
+    try:
+        files = list_segment_files(seg_dir)
+    except FileNotFoundError as e:
+        print(e)
+        return
     rows, cols = compute_grid(len(files), args.cols if args.cols > 0 else None)
 
     # Open all captures and gather stream info
