@@ -1,0 +1,96 @@
+# Project definitions (do not edit)
+Task: pigs-heart-rate-top
+scorer: Steven
+date: Jan20
+multianimalproject: false
+identity:
+
+
+# Project path (change when moving around)
+project_path: /content/drive/MyDrive/pigs-heart-rate-top-dlc-2026-01-20
+
+
+# Default DeepLabCut engine to use for shuffle creation (either pytorch or tensorflow)
+engine: pytorch
+
+
+# Annotation data set configuration (and individual video cropping parameters)
+video_sets:
+  /content/drive/MyDrive/pigs-heart-rate-top-dlc-2026-01-20/videos/Excellent-vlc-record-2025-12-02-23h56m49s-D10_S20250917132808_E20250917133629.mp4-.mp4:
+    crop: 0, 2592, 0, 1944
+  /content/drive/MyDrive/pigs-heart-rate-top-dlc-2026-01-20/videos/Excellent-vlc-record-2025-12-02-23h58m41s-D10_S20250917133629_E20250917134451.mp4-.mp4:
+    crop: 0, 2592, 0, 1944
+  /content/drive/MyDrive/pigs-heart-rate-top-dlc-2026-01-20/videos/Excellent.Long-vlc-record-2025-12-02-23h48m30s-D9_S20250917111932_E20250917112754.mp4-.mp4:
+    crop: 0, 2592, 0, 1944
+  /content/drive/MyDrive/pigs-heart-rate-top-dlc-2026-01-20/videos/Excellent.Long-vlc-record-2025-12-02-23h52m13s-D9_S20250917133500_E20250917134325.mp4-.mp4:
+    crop: 0, 2592, 0, 1944
+  /content/drive/MyDrive/pigs-heart-rate-top-dlc-2026-01-20/videos/Good-vlc-record-2025-12-02-23h33m18s-D2_S20250917115004_E20250917115825.mp4-.mp4:
+    crop: 0, 2592, 0, 1944
+  /content/drive/MyDrive/pigs-heart-rate-top-dlc-2026-01-20/videos/Good-vlc-record-2025-12-02-23h35m29s-D2_S20250917115004_E20250917115825.mp4-.mp4:
+    crop: 0, 2592, 0, 1944
+  /content/drive/MyDrive/pigs-heart-rate-top-dlc-2026-01-20/videos/Good-vlc-record-2025-12-02-23h41m34s-D5_S20250917111633_E20250917112452.mp4-.mp4:
+    crop: 0, 2592, 0, 1944
+bodyparts:
+- L ear base
+- R ear base
+- Mid snout
+- Ext occipital protuberance
+
+
+# Fraction of video to start/stop when extracting frames for labeling/refinement
+start: 0
+stop: 1
+numframes2pick: 20
+
+
+# Plotting configuration
+skeleton:
+- - L ear base
+  - R ear base
+- - L ear base
+  - Mid snout
+- - L ear base
+  - Ext occipital protuberance
+- - R ear base
+  - Mid snout
+- - R ear base
+  - Ext occipital protuberance
+- - Mid snout
+  - Ext occipital protuberance
+skeleton_color: black
+pcutoff: 0.6
+dotsize: 12
+alphavalue: 0.7
+colormap: rainbow
+
+
+# Training,Evaluation and Analysis configuration
+TrainingFraction:
+- 0.95
+iteration: 0
+default_net_type: resnet_50
+default_augmenter: default
+snapshotindex: -1
+detector_snapshotindex: -1
+batch_size: 8
+detector_batch_size: 1
+
+
+# Cropping Parameters (for analysis and outlier frame detection)
+cropping: false
+#if cropping is true for analysis, then set the values here:
+x1: 0
+x2: 640
+y1: 277
+y2: 624
+
+
+# Refinement configuration (parameters from annotation dataset configuration also relevant in this stage)
+corner2move2:
+- 50
+- 50
+move2corner: true
+
+
+# Conversion tables to fine-tune SuperAnimal weights
+SuperAnimalConversionTables:

@@ -1,0 +1,1040 @@
+2026-01-22 13:14:14 Training with configuration:
+2026-01-22 13:14:14 data:
+2026-01-22 13:14:14   bbox_margin: 20
+2026-01-22 13:14:14   colormode: RGB
+2026-01-22 13:14:14   inference:
+2026-01-22 13:14:14     normalize_images: True
+2026-01-22 13:14:14     auto_padding:
+2026-01-22 13:14:14       pad_width_divisor: 32
+2026-01-22 13:14:14       pad_height_divisor: 32
+2026-01-22 13:14:14   train:
+2026-01-22 13:14:14     resize:
+2026-01-22 13:14:14       width: 1296
+2026-01-22 13:14:14       height: 972
+2026-01-22 13:14:14     affine:
+2026-01-22 13:14:14       p: 0.5
+2026-01-22 13:14:14       rotation: 30
+2026-01-22 13:14:14       scaling: [0.5, 1.25]
+2026-01-22 13:14:14       translation: 0
+2026-01-22 13:14:14     crop_sampling:
+2026-01-22 13:14:14       width: 488
+2026-01-22 13:14:14       height: 488
+2026-01-22 13:14:14       max_shift: 0.4
+2026-01-22 13:14:14       method: hybrid
+2026-01-22 13:14:14     gaussian_noise: 12.75
+2026-01-22 13:14:14     motion_blur: True
+2026-01-22 13:14:14     normalize_images: True
+2026-01-22 13:14:14     auto_padding:
+2026-01-22 13:14:14       pad_width_divisor: 32
+2026-01-22 13:14:14       pad_height_divisor: 32
+2026-01-22 13:14:14 device: auto
+2026-01-22 13:14:14 inference:
+2026-01-22 13:14:14   multithreading:
+2026-01-22 13:14:14     enabled: True
+2026-01-22 13:14:14     queue_length: 4
+2026-01-22 13:14:14     timeout: 30.0
+2026-01-22 13:14:14   compile:
+2026-01-22 13:14:14     enabled: False
+2026-01-22 13:14:14     backend: inductor
+2026-01-22 13:14:14   autocast:
+2026-01-22 13:14:14     enabled: False
+2026-01-22 13:14:14 metadata:
+2026-01-22 13:14:14   project_path: /content/drive/MyDrive/pigs-heart-rate-top-dlc-2026-01-20
+2026-01-22 13:14:14   pose_config_path: /content/drive/MyDrive/pigs-heart-rate-top-dlc-2026-01-20/dlc-models-pytorch/iteration-0/pigs-heart-rate-topJan20-trainset95shuffle7/train/pytorch_config.yaml
+2026-01-22 13:14:14   bodyparts: ['L ear base', 'R ear base', 'Mid snout', 'Ext occipital protuberance']
+2026-01-22 13:14:14   unique_bodyparts: []
+2026-01-22 13:14:14   individuals: ['animal']
+2026-01-22 13:14:14   with_identity: None
+2026-01-22 13:14:14 method: bu
+2026-01-22 13:14:14 model:
+2026-01-22 13:14:14   backbone:
+2026-01-22 13:14:14     type: HRNet
+2026-01-22 13:14:14     model_name: hrnet_w32
+2026-01-22 13:14:14     freeze_bn_stats: True
+2026-01-22 13:14:14     freeze_bn_weights: False
+2026-01-22 13:14:14     interpolate_branches: False
+2026-01-22 13:14:14     increased_channel_count: False
+2026-01-22 13:14:14   backbone_output_channels: 32
+2026-01-22 13:14:14   heads:
+2026-01-22 13:14:14     bodypart:
+2026-01-22 13:14:14       type: HeatmapHead
+2026-01-22 13:14:14       weight_init: normal
+2026-01-22 13:14:14       predictor:
+2026-01-22 13:14:14         type: HeatmapPredictor
+2026-01-22 13:14:14         apply_sigmoid: False
+2026-01-22 13:14:14         clip_scores: True
+2026-01-22 13:14:14         location_refinement: True
+2026-01-22 13:14:14         locref_std: 7.2801
+2026-01-22 13:14:14       target_generator:
+2026-01-22 13:14:14         type: HeatmapGaussianGenerator
+2026-01-22 13:14:14         num_heatmaps: 4
+2026-01-22 13:14:14         pos_dist_thresh: 17
+2026-01-22 13:14:14         heatmap_mode: KEYPOINT
+2026-01-22 13:14:14         gradient_masking: False
+2026-01-22 13:14:14         generate_locref: True
+2026-01-22 13:14:14         locref_std: 7.2801
+2026-01-22 13:14:14       criterion:
+2026-01-22 13:14:14         heatmap:
+2026-01-22 13:14:14           type: WeightedMSECriterion
+2026-01-22 13:14:14           weight: 1.0
+2026-01-22 13:14:14         locref:
+2026-01-22 13:14:14           type: WeightedHuberCriterion
+2026-01-22 13:14:14           weight: 0.05
+2026-01-22 13:14:14       heatmap_config:
+2026-01-22 13:14:14         channels: [32, 4]
+2026-01-22 13:14:14         kernel_size: [3]
+2026-01-22 13:14:14         strides: [2]
+2026-01-22 13:14:14       locref_config:
+2026-01-22 13:14:14         channels: [32, 8]
+2026-01-22 13:14:14         kernel_size: [3]
+2026-01-22 13:14:14         strides: [2]
+2026-01-22 13:14:14 net_type: hrnet_w32
+2026-01-22 13:14:14 runner:
+2026-01-22 13:14:14   type: PoseTrainingRunner
+2026-01-22 13:14:14   gpus: None
+2026-01-22 13:14:14   key_metric: test.mAP
+2026-01-22 13:14:14   key_metric_asc: True
+2026-01-22 13:14:14   eval_interval: 10
+2026-01-22 13:14:14   optimizer:
+2026-01-22 13:14:14     type: AdamW
+2026-01-22 13:14:14     params:
+2026-01-22 13:14:14       lr: 0.0001
+2026-01-22 13:14:14   scheduler:
+2026-01-22 13:14:14     type: LRListScheduler
+2026-01-22 13:14:14     params:
+2026-01-22 13:14:14       lr_list: [[1e-05], [1e-06]]
+2026-01-22 13:14:14       milestones: [160, 190]
+2026-01-22 13:14:14   snapshots:
+2026-01-22 13:14:14     max_snapshots: 5
+2026-01-22 13:14:14     save_epochs: 5
+2026-01-22 13:14:14     save_optimizer_state: False
+2026-01-22 13:14:14 train_settings:
+2026-01-22 13:14:14   batch_size: 16
+2026-01-22 13:14:14   dataloader_workers: 0
+2026-01-22 13:14:14   dataloader_pin_memory: False
+2026-01-22 13:14:14   display_iters: 500
+2026-01-22 13:14:14   epochs: 50
+2026-01-22 13:14:14   seed: 42
+2026-01-22 13:15:43 Training with configuration:
+2026-01-22 13:15:43 data:
+2026-01-22 13:15:43   bbox_margin: 20
+2026-01-22 13:15:43   colormode: RGB
+2026-01-22 13:15:43   inference:
+2026-01-22 13:15:43     normalize_images: True
+2026-01-22 13:15:43     auto_padding:
+2026-01-22 13:15:43       pad_width_divisor: 32
+2026-01-22 13:15:43       pad_height_divisor: 32
+2026-01-22 13:15:43   train:
+2026-01-22 13:15:43     resize:
+2026-01-22 13:15:43       width: 1296
+2026-01-22 13:15:43       height: 972
+2026-01-22 13:15:43     affine:
+2026-01-22 13:15:43       p: 0.5
+2026-01-22 13:15:43       rotation: 30
+2026-01-22 13:15:43       scaling: [0.5, 1.25]
+2026-01-22 13:15:43       translation: 0
+2026-01-22 13:15:43     crop_sampling:
+2026-01-22 13:15:43       width: 488
+2026-01-22 13:15:43       height: 488
+2026-01-22 13:15:43       max_shift: 0.4
+2026-01-22 13:15:43       method: hybrid
+2026-01-22 13:15:43     gaussian_noise: 12.75
+2026-01-22 13:15:43     motion_blur: True
+2026-01-22 13:15:43     normalize_images: True
+2026-01-22 13:15:43     auto_padding:
+2026-01-22 13:15:43       pad_width_divisor: 32
+2026-01-22 13:15:43       pad_height_divisor: 32
+2026-01-22 13:15:43 device: auto
+2026-01-22 13:15:43 inference:
+2026-01-22 13:15:43   multithreading:
+2026-01-22 13:15:43     enabled: True
+2026-01-22 13:15:43     queue_length: 4
+2026-01-22 13:15:43     timeout: 30.0
+2026-01-22 13:15:43   compile:
+2026-01-22 13:15:43     enabled: False
+2026-01-22 13:15:43     backend: inductor
+2026-01-22 13:15:43   autocast:
+2026-01-22 13:15:43     enabled: False
+2026-01-22 13:15:43 metadata:
+2026-01-22 13:15:43   project_path: /content/drive/MyDrive/pigs-heart-rate-top-dlc-2026-01-20
+2026-01-22 13:15:43   pose_config_path: /content/drive/MyDrive/pigs-heart-rate-top-dlc-2026-01-20/dlc-models-pytorch/iteration-0/pigs-heart-rate-topJan20-trainset95shuffle7/train/pytorch_config.yaml
+2026-01-22 13:15:43   bodyparts: ['L ear base', 'R ear base', 'Mid snout', 'Ext occipital protuberance']
+2026-01-22 13:15:43   unique_bodyparts: []
+2026-01-22 13:15:43   individuals: ['animal']
+2026-01-22 13:15:43   with_identity: None
+2026-01-22 13:15:43 method: bu
+2026-01-22 13:15:43 model:
+2026-01-22 13:15:43   backbone:
+2026-01-22 13:15:43     type: HRNet
+2026-01-22 13:15:43     model_name: hrnet_w32
+2026-01-22 13:15:43     freeze_bn_stats: True
+2026-01-22 13:15:43     freeze_bn_weights: False
+2026-01-22 13:15:43     interpolate_branches: False
+2026-01-22 13:15:43     increased_channel_count: False
+2026-01-22 13:15:43   backbone_output_channels: 32
+2026-01-22 13:15:43   heads:
+2026-01-22 13:15:43     bodypart:
+2026-01-22 13:15:43       type: HeatmapHead
+2026-01-22 13:15:43       weight_init: normal
+2026-01-22 13:15:43       predictor:
+2026-01-22 13:15:43         type: HeatmapPredictor
+2026-01-22 13:15:43         apply_sigmoid: False
+2026-01-22 13:15:43         clip_scores: True
+2026-01-22 13:15:43         location_refinement: True
+2026-01-22 13:15:43         locref_std: 7.2801
+2026-01-22 13:15:43       target_generator:
+2026-01-22 13:15:43         type: HeatmapGaussianGenerator
+2026-01-22 13:15:43         num_heatmaps: 4
+2026-01-22 13:15:43         pos_dist_thresh: 17
+2026-01-22 13:15:43         heatmap_mode: KEYPOINT
+2026-01-22 13:15:43         gradient_masking: False
+2026-01-22 13:15:43         generate_locref: True
+2026-01-22 13:15:43         locref_std: 7.2801
+2026-01-22 13:15:43       criterion:
+2026-01-22 13:15:43         heatmap:
+2026-01-22 13:15:43           type: WeightedMSECriterion
+2026-01-22 13:15:43           weight: 1.0
+2026-01-22 13:15:43         locref:
+2026-01-22 13:15:43           type: WeightedHuberCriterion
+2026-01-22 13:15:43           weight: 0.05
+2026-01-22 13:15:43       heatmap_config:
+2026-01-22 13:15:43         channels: [32, 4]
+2026-01-22 13:15:43         kernel_size: [3]
+2026-01-22 13:15:43         strides: [2]
+2026-01-22 13:15:43       locref_config:
+2026-01-22 13:15:43         channels: [32, 8]
+2026-01-22 13:15:43         kernel_size: [3]
+2026-01-22 13:15:43         strides: [2]
+2026-01-22 13:15:43 net_type: hrnet_w32
+2026-01-22 13:15:43 runner:
+2026-01-22 13:15:43   type: PoseTrainingRunner
+2026-01-22 13:15:43   gpus: None
+2026-01-22 13:15:43   key_metric: test.mAP
+2026-01-22 13:15:43   key_metric_asc: True
+2026-01-22 13:15:43   eval_interval: 10
+2026-01-22 13:15:43   optimizer:
+2026-01-22 13:15:43     type: AdamW
+2026-01-22 13:15:43     params:
+2026-01-22 13:15:43       lr: 0.0001
+2026-01-22 13:15:43   scheduler:
+2026-01-22 13:15:43     type: LRListScheduler
+2026-01-22 13:15:43     params:
+2026-01-22 13:15:43       lr_list: [[1e-05], [1e-06]]
+2026-01-22 13:15:43       milestones: [160, 190]
+2026-01-22 13:15:43   snapshots:
+2026-01-22 13:15:43     max_snapshots: 5
+2026-01-22 13:15:43     save_epochs: 5
+2026-01-22 13:15:43     save_optimizer_state: False
+2026-01-22 13:15:43 train_settings:
+2026-01-22 13:15:43   batch_size: 16
+2026-01-22 13:15:43   dataloader_workers: 0
+2026-01-22 13:15:43   dataloader_pin_memory: False
+2026-01-22 13:15:43   display_iters: 500
+2026-01-22 13:15:43   epochs: 50
+2026-01-22 13:15:43   seed: 42
+2026-01-22 13:15:44 Loading pretrained weights from Hugging Face hub (timm/hrnet_w32.ms_in1k)
+2026-01-22 13:15:49 [timm/hrnet_w32.ms_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-01-22 13:15:49 Unexpected keys (downsamp_modules.0.1.num_batches_tracked, downsamp_modules.1.1.num_batches_tracked, downsamp_modules.2.1.num_batches_tracked, final_layer.1.num_batches_tracked, incre_modules.0.0.bn1.num_batches_tracked, incre_modules.0.0.bn2.num_batches_tracked, incre_modules.0.0.bn3.num_batches_tracked, incre_modules.0.0.downsample.1.num_batches_tracked, incre_modules.1.0.bn1.num_batches_tracked, incre_modules.1.0.bn2.num_batches_tracked, incre_modules.1.0.bn3.num_batches_tracked, incre_modules.1.0.downsample.1.num_batches_tracked, incre_modules.2.0.bn1.num_batches_tracked, incre_modules.2.0.bn2.num_batches_tracked, incre_modules.2.0.bn3.num_batches_tracked, incre_modules.2.0.downsample.1.num_batches_tracked, incre_modules.3.0.bn1.num_batches_tracked, incre_modules.3.0.bn2.num_batches_tracked, incre_modules.3.0.bn3.num_batches_tracked, incre_modules.3.0.downsample.1.num_batches_tracked, downsamp_modules.0.0.bias, downsamp_modules.0.0.weight, downsamp_modules.0.1.bias, downsamp_modules.0.1.running_mean, downsamp_modules.0.1.running_var, downsamp_modules.0.1.weight, downsamp_modules.1.0.bias, downsamp_modules.1.0.weight, downsamp_modules.1.1.bias, downsamp_modules.1.1.running_mean, downsamp_modules.1.1.running_var, downsamp_modules.1.1.weight, downsamp_modules.2.0.bias, downsamp_modules.2.0.weight, downsamp_modules.2.1.bias, downsamp_modules.2.1.running_mean, downsamp_modules.2.1.running_var, downsamp_modules.2.1.weight, final_layer.0.bias, final_layer.0.weight, final_layer.1.bias, final_layer.1.running_mean, final_layer.1.running_var, final_layer.1.weight, incre_modules.0.0.bn1.bias, incre_modules.0.0.bn1.running_mean, incre_modules.0.0.bn1.running_var, incre_modules.0.0.bn1.weight, incre_modules.0.0.bn2.bias, incre_modules.0.0.bn2.running_mean, incre_modules.0.0.bn2.running_var, incre_modules.0.0.bn2.weight, incre_modules.0.0.bn3.bias, incre_modules.0.0.bn3.running_mean, incre_modules.0.0.bn3.running_var, incre_modules.0.0.bn3.weight, incre_modules.0.0.conv1.weight, incre_modules.0.0.conv2.weight, incre_modules.0.0.conv3.weight, incre_modules.0.0.downsample.0.weight, incre_modules.0.0.downsample.1.bias, incre_modules.0.0.downsample.1.running_mean, incre_modules.0.0.downsample.1.running_var, incre_modules.0.0.downsample.1.weight, incre_modules.1.0.bn1.bias, incre_modules.1.0.bn1.running_mean, incre_modules.1.0.bn1.running_var, incre_modules.1.0.bn1.weight, incre_modules.1.0.bn2.bias, incre_modules.1.0.bn2.running_mean, incre_modules.1.0.bn2.running_var, incre_modules.1.0.bn2.weight, incre_modules.1.0.bn3.bias, incre_modules.1.0.bn3.running_mean, incre_modules.1.0.bn3.running_var, incre_modules.1.0.bn3.weight, incre_modules.1.0.conv1.weight, incre_modules.1.0.conv2.weight, incre_modules.1.0.conv3.weight, incre_modules.1.0.downsample.0.weight, incre_modules.1.0.downsample.1.bias, incre_modules.1.0.downsample.1.running_mean, incre_modules.1.0.downsample.1.running_var, incre_modules.1.0.downsample.1.weight, incre_modules.2.0.bn1.bias, incre_modules.2.0.bn1.running_mean, incre_modules.2.0.bn1.running_var, incre_modules.2.0.bn1.weight, incre_modules.2.0.bn2.bias, incre_modules.2.0.bn2.running_mean, incre_modules.2.0.bn2.running_var, incre_modules.2.0.bn2.weight, incre_modules.2.0.bn3.bias, incre_modules.2.0.bn3.running_mean, incre_modules.2.0.bn3.running_var, incre_modules.2.0.bn3.weight, incre_modules.2.0.conv1.weight, incre_modules.2.0.conv2.weight, incre_modules.2.0.conv3.weight, incre_modules.2.0.downsample.0.weight, incre_modules.2.0.downsample.1.bias, incre_modules.2.0.downsample.1.running_mean, incre_modules.2.0.downsample.1.running_var, incre_modules.2.0.downsample.1.weight, incre_modules.3.0.bn1.bias, incre_modules.3.0.bn1.running_mean, incre_modules.3.0.bn1.running_var, incre_modules.3.0.bn1.weight, incre_modules.3.0.bn2.bias, incre_modules.3.0.bn2.running_mean, incre_modules.3.0.bn2.running_var, incre_modules.3.0.bn2.weight, incre_modules.3.0.bn3.bias, incre_modules.3.0.bn3.running_mean, incre_modules.3.0.bn3.running_var, incre_modules.3.0.bn3.weight, incre_modules.3.0.conv1.weight, incre_modules.3.0.conv2.weight, incre_modules.3.0.conv3.weight, incre_modules.3.0.downsample.0.weight, incre_modules.3.0.downsample.1.bias, incre_modules.3.0.downsample.1.running_mean, incre_modules.3.0.downsample.1.running_var, incre_modules.3.0.downsample.1.weight, classifier.bias, classifier.weight) found while loading pretrained weights. This may be expected if model is being adapted.
+2026-01-22 13:15:50 Data Transforms:
+2026-01-22 13:15:50   Training:   Compose([
+  KeepAspectRatioResize(always_apply=True, p=1.0, height=972, width=1296, mode='pad', interpolation=1),
+  PadIfNeeded(always_apply=False, p=1.0, min_height=972, min_width=1296, pad_height_divisor=None, pad_width_divisor=None, position=PositionType.TOP_LEFT, border_mode=0, value=None, mask_value=None),
+  Affine(always_apply=False, p=0.5, interpolation=1, mask_interpolation=0, cval=0, mode=0, scale={'x': (0.5, 1.25), 'y': (0.5, 1.25)}, translate_percent=None, translate_px={'x': (0, 0), 'y': (0, 0)}, rotate=(-30, 30), fit_output=False, shear={'x': (0.0, 0.0), 'y': (0.0, 0.0)}, cval_mask=0, keep_ratio=True, rotate_method='largest_box'),
+  PadIfNeeded(always_apply=True, p=1.0, min_height=488, min_width=488, pad_height_divisor=None, pad_width_divisor=None, position=PositionType.CENTER, border_mode=0, value=None, mask_value=None),
+  KeypointAwareCrop(always_apply=True, p=1.0, width=488, height=488, max_shift=0.4, crop_sampling='hybrid'),
+  MotionBlur(always_apply=False, p=0.5, blur_limit=(3, 7), allow_shifted=True),
+  GaussNoise(always_apply=False, p=0.5, var_limit=(0, 162.5625), per_channel=True, mean=0),
+  PadIfNeeded(always_apply=False, p=1.0, min_height=None, min_width=None, pad_height_divisor=32, pad_width_divisor=32, position=PositionType.RANDOM, border_mode=4, value=None, mask_value=None),
+  Normalize(always_apply=False, p=1.0, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], max_pixel_value=255.0),
+], p=1.0, bbox_params={'format': 'coco', 'label_fields': ['bbox_labels'], 'min_area': 0.0, 'min_visibility': 0.0, 'min_width': 0.0, 'min_height': 0.0, 'check_each_transform': True}, keypoint_params={'format': 'xy', 'label_fields': ['class_labels'], 'remove_invisible': False, 'angle_in_degrees': True, 'check_each_transform': True}, additional_targets={}, is_check_shapes=True)
+2026-01-22 13:15:50   Validation: Compose([
+  PadIfNeeded(always_apply=False, p=1.0, min_height=None, min_width=None, pad_height_divisor=32, pad_width_divisor=32, position=PositionType.RANDOM, border_mode=4, value=None, mask_value=None),
+  Normalize(always_apply=False, p=1.0, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], max_pixel_value=255.0),
+], p=1.0, bbox_params={'format': 'coco', 'label_fields': ['bbox_labels'], 'min_area': 0.0, 'min_visibility': 0.0, 'min_width': 0.0, 'min_height': 0.0, 'check_each_transform': True}, keypoint_params={'format': 'xy', 'label_fields': ['class_labels'], 'remove_invisible': False, 'angle_in_degrees': True, 'check_each_transform': True}, additional_targets={}, is_check_shapes=True)
+2026-01-22 13:15:52 
+Note: According to your model configuration, you're training with batch size 1 and/or ``freeze_bn_stats=false``. This is not an optimal setting if you have powerful GPUs.
+This is good for small batch sizes (e.g., when training on a CPU), where you should keep ``freeze_bn_stats=true``.
+If you're using a GPU to train, you can obtain faster performance by setting a larger batch size (the biggest power of 2 where you don't geta CUDA out-of-memory error, such as 8, 16, 32 or 64 depending on the model, size of your images, and GPU memory) and ``freeze_bn_stats=false`` for the backbone of your model. 
+This also allows you to increase the learning rate (empirically you can scale the learning rate by sqrt(batch_size) times).
+
+2026-01-22 13:15:52 Using 123 images and 7 for testing
+2026-01-22 13:15:52 
+Starting pose model training...
+--------------------------------------------------
+2026-01-22 13:16:48 Training with configuration:
+2026-01-22 13:16:48 data:
+2026-01-22 13:16:48   bbox_margin: 20
+2026-01-22 13:16:48   colormode: RGB
+2026-01-22 13:16:48   inference:
+2026-01-22 13:16:48     resize:
+2026-01-22 13:16:48       width: 1296
+2026-01-22 13:16:48       height: 972
+2026-01-22 13:16:48     normalize_images: True
+2026-01-22 13:16:48     auto_padding:
+2026-01-22 13:16:48       pad_width_divisor: 32
+2026-01-22 13:16:48       pad_height_divisor: 32
+2026-01-22 13:16:48   train:
+2026-01-22 13:16:48     resize:
+2026-01-22 13:16:48       width: 1296
+2026-01-22 13:16:48       height: 972
+2026-01-22 13:16:48     affine:
+2026-01-22 13:16:48       p: 0.5
+2026-01-22 13:16:48       rotation: 30
+2026-01-22 13:16:48       scaling: [0.5, 1.25]
+2026-01-22 13:16:48       translation: 0
+2026-01-22 13:16:48     crop_sampling:
+2026-01-22 13:16:48       width: 488
+2026-01-22 13:16:48       height: 488
+2026-01-22 13:16:48       max_shift: 0.4
+2026-01-22 13:16:48       method: hybrid
+2026-01-22 13:16:48     gaussian_noise: 12.75
+2026-01-22 13:16:48     motion_blur: True
+2026-01-22 13:16:48     normalize_images: True
+2026-01-22 13:16:48     auto_padding:
+2026-01-22 13:16:48       pad_width_divisor: 32
+2026-01-22 13:16:48       pad_height_divisor: 32
+2026-01-22 13:16:48 device: auto
+2026-01-22 13:16:48 inference:
+2026-01-22 13:16:48   multithreading:
+2026-01-22 13:16:48     enabled: True
+2026-01-22 13:16:48     queue_length: 4
+2026-01-22 13:16:48     timeout: 30.0
+2026-01-22 13:16:48   compile:
+2026-01-22 13:16:48     enabled: False
+2026-01-22 13:16:48     backend: inductor
+2026-01-22 13:16:48   autocast:
+2026-01-22 13:16:48     enabled: False
+2026-01-22 13:16:48 metadata:
+2026-01-22 13:16:48   project_path: /content/drive/MyDrive/pigs-heart-rate-top-dlc-2026-01-20
+2026-01-22 13:16:48   pose_config_path: /content/drive/MyDrive/pigs-heart-rate-top-dlc-2026-01-20/dlc-models-pytorch/iteration-0/pigs-heart-rate-topJan20-trainset95shuffle7/train/pytorch_config.yaml
+2026-01-22 13:16:48   bodyparts: ['L ear base', 'R ear base', 'Mid snout', 'Ext occipital protuberance']
+2026-01-22 13:16:48   unique_bodyparts: []
+2026-01-22 13:16:48   individuals: ['animal']
+2026-01-22 13:16:48   with_identity: None
+2026-01-22 13:16:48 method: bu
+2026-01-22 13:16:48 model:
+2026-01-22 13:16:48   backbone:
+2026-01-22 13:16:48     type: HRNet
+2026-01-22 13:16:48     model_name: hrnet_w32
+2026-01-22 13:16:48     freeze_bn_stats: True
+2026-01-22 13:16:48     freeze_bn_weights: False
+2026-01-22 13:16:48     interpolate_branches: False
+2026-01-22 13:16:48     increased_channel_count: False
+2026-01-22 13:16:48   backbone_output_channels: 32
+2026-01-22 13:16:48   heads:
+2026-01-22 13:16:48     bodypart:
+2026-01-22 13:16:48       type: HeatmapHead
+2026-01-22 13:16:48       weight_init: normal
+2026-01-22 13:16:48       predictor:
+2026-01-22 13:16:48         type: HeatmapPredictor
+2026-01-22 13:16:48         apply_sigmoid: False
+2026-01-22 13:16:48         clip_scores: True
+2026-01-22 13:16:48         location_refinement: True
+2026-01-22 13:16:48         locref_std: 7.2801
+2026-01-22 13:16:48       target_generator:
+2026-01-22 13:16:48         type: HeatmapGaussianGenerator
+2026-01-22 13:16:48         num_heatmaps: 4
+2026-01-22 13:16:48         pos_dist_thresh: 17
+2026-01-22 13:16:48         heatmap_mode: KEYPOINT
+2026-01-22 13:16:48         gradient_masking: False
+2026-01-22 13:16:48         generate_locref: True
+2026-01-22 13:16:48         locref_std: 7.2801
+2026-01-22 13:16:48       criterion:
+2026-01-22 13:16:48         heatmap:
+2026-01-22 13:16:48           type: WeightedMSECriterion
+2026-01-22 13:16:48           weight: 1.0
+2026-01-22 13:16:48         locref:
+2026-01-22 13:16:48           type: WeightedHuberCriterion
+2026-01-22 13:16:48           weight: 0.05
+2026-01-22 13:16:48       heatmap_config:
+2026-01-22 13:16:48         channels: [32, 4]
+2026-01-22 13:16:48         kernel_size: [3]
+2026-01-22 13:16:48         strides: [2]
+2026-01-22 13:16:48       locref_config:
+2026-01-22 13:16:48         channels: [32, 8]
+2026-01-22 13:16:48         kernel_size: [3]
+2026-01-22 13:16:48         strides: [2]
+2026-01-22 13:16:48 net_type: hrnet_w32
+2026-01-22 13:16:48 runner:
+2026-01-22 13:16:48   type: PoseTrainingRunner
+2026-01-22 13:16:48   gpus: None
+2026-01-22 13:16:48   key_metric: test.mAP
+2026-01-22 13:16:48   key_metric_asc: True
+2026-01-22 13:16:48   eval_interval: 10
+2026-01-22 13:16:48   optimizer:
+2026-01-22 13:16:48     type: AdamW
+2026-01-22 13:16:48     params:
+2026-01-22 13:16:48       lr: 0.0001
+2026-01-22 13:16:48   scheduler:
+2026-01-22 13:16:48     type: LRListScheduler
+2026-01-22 13:16:48     params:
+2026-01-22 13:16:48       lr_list: [[1e-05], [1e-06]]
+2026-01-22 13:16:48       milestones: [160, 190]
+2026-01-22 13:16:48   snapshots:
+2026-01-22 13:16:48     max_snapshots: 5
+2026-01-22 13:16:48     save_epochs: 5
+2026-01-22 13:16:48     save_optimizer_state: False
+2026-01-22 13:16:48 train_settings:
+2026-01-22 13:16:48   batch_size: 16
+2026-01-22 13:16:48   dataloader_workers: 0
+2026-01-22 13:16:48   dataloader_pin_memory: False
+2026-01-22 13:16:48   display_iters: 500
+2026-01-22 13:16:48   epochs: 50
+2026-01-22 13:16:48   seed: 42
+2026-01-22 13:16:48 Loading pretrained weights from Hugging Face hub (timm/hrnet_w32.ms_in1k)
+2026-01-22 13:16:49 [timm/hrnet_w32.ms_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-01-22 13:16:49 Unexpected keys (downsamp_modules.0.1.num_batches_tracked, downsamp_modules.1.1.num_batches_tracked, downsamp_modules.2.1.num_batches_tracked, final_layer.1.num_batches_tracked, incre_modules.0.0.bn1.num_batches_tracked, incre_modules.0.0.bn2.num_batches_tracked, incre_modules.0.0.bn3.num_batches_tracked, incre_modules.0.0.downsample.1.num_batches_tracked, incre_modules.1.0.bn1.num_batches_tracked, incre_modules.1.0.bn2.num_batches_tracked, incre_modules.1.0.bn3.num_batches_tracked, incre_modules.1.0.downsample.1.num_batches_tracked, incre_modules.2.0.bn1.num_batches_tracked, incre_modules.2.0.bn2.num_batches_tracked, incre_modules.2.0.bn3.num_batches_tracked, incre_modules.2.0.downsample.1.num_batches_tracked, incre_modules.3.0.bn1.num_batches_tracked, incre_modules.3.0.bn2.num_batches_tracked, incre_modules.3.0.bn3.num_batches_tracked, incre_modules.3.0.downsample.1.num_batches_tracked, downsamp_modules.0.0.bias, downsamp_modules.0.0.weight, downsamp_modules.0.1.bias, downsamp_modules.0.1.running_mean, downsamp_modules.0.1.running_var, downsamp_modules.0.1.weight, downsamp_modules.1.0.bias, downsamp_modules.1.0.weight, downsamp_modules.1.1.bias, downsamp_modules.1.1.running_mean, downsamp_modules.1.1.running_var, downsamp_modules.1.1.weight, downsamp_modules.2.0.bias, downsamp_modules.2.0.weight, downsamp_modules.2.1.bias, downsamp_modules.2.1.running_mean, downsamp_modules.2.1.running_var, downsamp_modules.2.1.weight, final_layer.0.bias, final_layer.0.weight, final_layer.1.bias, final_layer.1.running_mean, final_layer.1.running_var, final_layer.1.weight, incre_modules.0.0.bn1.bias, incre_modules.0.0.bn1.running_mean, incre_modules.0.0.bn1.running_var, incre_modules.0.0.bn1.weight, incre_modules.0.0.bn2.bias, incre_modules.0.0.bn2.running_mean, incre_modules.0.0.bn2.running_var, incre_modules.0.0.bn2.weight, incre_modules.0.0.bn3.bias, incre_modules.0.0.bn3.running_mean, incre_modules.0.0.bn3.running_var, incre_modules.0.0.bn3.weight, incre_modules.0.0.conv1.weight, incre_modules.0.0.conv2.weight, incre_modules.0.0.conv3.weight, incre_modules.0.0.downsample.0.weight, incre_modules.0.0.downsample.1.bias, incre_modules.0.0.downsample.1.running_mean, incre_modules.0.0.downsample.1.running_var, incre_modules.0.0.downsample.1.weight, incre_modules.1.0.bn1.bias, incre_modules.1.0.bn1.running_mean, incre_modules.1.0.bn1.running_var, incre_modules.1.0.bn1.weight, incre_modules.1.0.bn2.bias, incre_modules.1.0.bn2.running_mean, incre_modules.1.0.bn2.running_var, incre_modules.1.0.bn2.weight, incre_modules.1.0.bn3.bias, incre_modules.1.0.bn3.running_mean, incre_modules.1.0.bn3.running_var, incre_modules.1.0.bn3.weight, incre_modules.1.0.conv1.weight, incre_modules.1.0.conv2.weight, incre_modules.1.0.conv3.weight, incre_modules.1.0.downsample.0.weight, incre_modules.1.0.downsample.1.bias, incre_modules.1.0.downsample.1.running_mean, incre_modules.1.0.downsample.1.running_var, incre_modules.1.0.downsample.1.weight, incre_modules.2.0.bn1.bias, incre_modules.2.0.bn1.running_mean, incre_modules.2.0.bn1.running_var, incre_modules.2.0.bn1.weight, incre_modules.2.0.bn2.bias, incre_modules.2.0.bn2.running_mean, incre_modules.2.0.bn2.running_var, incre_modules.2.0.bn2.weight, incre_modules.2.0.bn3.bias, incre_modules.2.0.bn3.running_mean, incre_modules.2.0.bn3.running_var, incre_modules.2.0.bn3.weight, incre_modules.2.0.conv1.weight, incre_modules.2.0.conv2.weight, incre_modules.2.0.conv3.weight, incre_modules.2.0.downsample.0.weight, incre_modules.2.0.downsample.1.bias, incre_modules.2.0.downsample.1.running_mean, incre_modules.2.0.downsample.1.running_var, incre_modules.2.0.downsample.1.weight, incre_modules.3.0.bn1.bias, incre_modules.3.0.bn1.running_mean, incre_modules.3.0.bn1.running_var, incre_modules.3.0.bn1.weight, incre_modules.3.0.bn2.bias, incre_modules.3.0.bn2.running_mean, incre_modules.3.0.bn2.running_var, incre_modules.3.0.bn2.weight, incre_modules.3.0.bn3.bias, incre_modules.3.0.bn3.running_mean, incre_modules.3.0.bn3.running_var, incre_modules.3.0.bn3.weight, incre_modules.3.0.conv1.weight, incre_modules.3.0.conv2.weight, incre_modules.3.0.conv3.weight, incre_modules.3.0.downsample.0.weight, incre_modules.3.0.downsample.1.bias, incre_modules.3.0.downsample.1.running_mean, incre_modules.3.0.downsample.1.running_var, incre_modules.3.0.downsample.1.weight, classifier.bias, classifier.weight) found while loading pretrained weights. This may be expected if model is being adapted.
+2026-01-22 13:16:49 Data Transforms:
+2026-01-22 13:16:49   Training:   Compose([
+  KeepAspectRatioResize(always_apply=True, p=1.0, height=972, width=1296, mode='pad', interpolation=1),
+  PadIfNeeded(always_apply=False, p=1.0, min_height=972, min_width=1296, pad_height_divisor=None, pad_width_divisor=None, position=PositionType.TOP_LEFT, border_mode=0, value=None, mask_value=None),
+  Affine(always_apply=False, p=0.5, interpolation=1, mask_interpolation=0, cval=0, mode=0, scale={'x': (0.5, 1.25), 'y': (0.5, 1.25)}, translate_percent=None, translate_px={'x': (0, 0), 'y': (0, 0)}, rotate=(-30, 30), fit_output=False, shear={'x': (0.0, 0.0), 'y': (0.0, 0.0)}, cval_mask=0, keep_ratio=True, rotate_method='largest_box'),
+  PadIfNeeded(always_apply=True, p=1.0, min_height=488, min_width=488, pad_height_divisor=None, pad_width_divisor=None, position=PositionType.CENTER, border_mode=0, value=None, mask_value=None),
+  KeypointAwareCrop(always_apply=True, p=1.0, width=488, height=488, max_shift=0.4, crop_sampling='hybrid'),
+  MotionBlur(always_apply=False, p=0.5, blur_limit=(3, 7), allow_shifted=True),
+  GaussNoise(always_apply=False, p=0.5, var_limit=(0, 162.5625), per_channel=True, mean=0),
+  PadIfNeeded(always_apply=False, p=1.0, min_height=None, min_width=None, pad_height_divisor=32, pad_width_divisor=32, position=PositionType.RANDOM, border_mode=4, value=None, mask_value=None),
+  Normalize(always_apply=False, p=1.0, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], max_pixel_value=255.0),
+], p=1.0, bbox_params={'format': 'coco', 'label_fields': ['bbox_labels'], 'min_area': 0.0, 'min_visibility': 0.0, 'min_width': 0.0, 'min_height': 0.0, 'check_each_transform': True}, keypoint_params={'format': 'xy', 'label_fields': ['class_labels'], 'remove_invisible': False, 'angle_in_degrees': True, 'check_each_transform': True}, additional_targets={}, is_check_shapes=True)
+2026-01-22 13:16:49   Validation: Compose([
+  KeepAspectRatioResize(always_apply=True, p=1.0, height=972, width=1296, mode='pad', interpolation=1),
+  PadIfNeeded(always_apply=False, p=1.0, min_height=972, min_width=1296, pad_height_divisor=None, pad_width_divisor=None, position=PositionType.TOP_LEFT, border_mode=0, value=None, mask_value=None),
+  PadIfNeeded(always_apply=False, p=1.0, min_height=None, min_width=None, pad_height_divisor=32, pad_width_divisor=32, position=PositionType.RANDOM, border_mode=4, value=None, mask_value=None),
+  Normalize(always_apply=False, p=1.0, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], max_pixel_value=255.0),
+], p=1.0, bbox_params={'format': 'coco', 'label_fields': ['bbox_labels'], 'min_area': 0.0, 'min_visibility': 0.0, 'min_width': 0.0, 'min_height': 0.0, 'check_each_transform': True}, keypoint_params={'format': 'xy', 'label_fields': ['class_labels'], 'remove_invisible': False, 'angle_in_degrees': True, 'check_each_transform': True}, additional_targets={}, is_check_shapes=True)
+2026-01-22 13:16:49 
+Note: According to your model configuration, you're training with batch size 1 and/or ``freeze_bn_stats=false``. This is not an optimal setting if you have powerful GPUs.
+This is good for small batch sizes (e.g., when training on a CPU), where you should keep ``freeze_bn_stats=true``.
+If you're using a GPU to train, you can obtain faster performance by setting a larger batch size (the biggest power of 2 where you don't geta CUDA out-of-memory error, such as 8, 16, 32 or 64 depending on the model, size of your images, and GPU memory) and ``freeze_bn_stats=false`` for the backbone of your model. 
+This also allows you to increase the learning rate (empirically you can scale the learning rate by sqrt(batch_size) times).
+
+2026-01-22 13:16:49 Using 123 images and 7 for testing
+2026-01-22 13:16:49 
+Starting pose model training...
+--------------------------------------------------
+2026-01-22 13:17:28 Epoch 1/50 (lr=0.0001), train loss 0.01499, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:18:07 Epoch 2/50 (lr=0.0001), train loss 0.01484, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:18:46 Epoch 3/50 (lr=0.0001), train loss 0.01435, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:19:25 Epoch 4/50 (lr=0.0001), train loss 0.01318, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:20:04 Epoch 5/50 (lr=0.0001), train loss 0.01111, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:20:43 Epoch 6/50 (lr=0.0001), train loss 0.00958, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:21:22 Epoch 7/50 (lr=0.0001), train loss 0.00826, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:22:01 Epoch 8/50 (lr=0.0001), train loss 0.00716, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:22:41 Epoch 9/50 (lr=0.0001), train loss 0.00711, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:23:19 Training for epoch 10 done, starting evaluation
+2026-01-22 13:23:23 Epoch 10/50 (lr=0.0001), train loss 0.00676, valid loss 0.00714, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:23:23 Model performance:
+2026-01-22 13:23:23   metrics/test.rmse:         187.46
+2026-01-22 13:23:23   metrics/test.rmse_pcutoff:    nan
+2026-01-22 13:23:23   metrics/test.mAP:            1.49
+2026-01-22 13:23:23   metrics/test.mAR:            2.86
+2026-01-22 13:24:02 Epoch 11/50 (lr=0.0001), train loss 0.00581, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:24:41 Epoch 12/50 (lr=0.0001), train loss 0.00505, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:25:21 Epoch 13/50 (lr=0.0001), train loss 0.00466, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:26:00 Epoch 14/50 (lr=0.0001), train loss 0.00508, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:26:39 Epoch 15/50 (lr=0.0001), train loss 0.00481, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:27:19 Epoch 16/50 (lr=0.0001), train loss 0.00450, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:27:58 Epoch 17/50 (lr=0.0001), train loss 0.00435, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:28:37 Epoch 18/50 (lr=0.0001), train loss 0.00398, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:29:16 Epoch 19/50 (lr=0.0001), train loss 0.00364, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:29:55 Training for epoch 20 done, starting evaluation
+2026-01-22 13:29:58 Epoch 20/50 (lr=0.0001), train loss 0.00361, valid loss 0.00435, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:29:58 Model performance:
+2026-01-22 13:29:58   metrics/test.rmse:          60.94
+2026-01-22 13:29:58   metrics/test.rmse_pcutoff:    nan
+2026-01-22 13:29:58   metrics/test.mAP:           13.66
+2026-01-22 13:29:58   metrics/test.mAR:           17.14
+2026-01-22 13:30:37 Epoch 21/50 (lr=0.0001), train loss 0.00370, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:31:16 Epoch 22/50 (lr=0.0001), train loss 0.00301, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:31:55 Epoch 23/50 (lr=0.0001), train loss 0.00316, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:32:35 Epoch 24/50 (lr=0.0001), train loss 0.00298, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:33:14 Epoch 25/50 (lr=0.0001), train loss 0.00328, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:33:54 Epoch 26/50 (lr=0.0001), train loss 0.00327, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:34:32 Epoch 27/50 (lr=0.0001), train loss 0.00331, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:35:11 Epoch 28/50 (lr=0.0001), train loss 0.00304, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:35:50 Epoch 29/50 (lr=0.0001), train loss 0.00309, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:36:29 Training for epoch 30 done, starting evaluation
+2026-01-22 13:36:32 Epoch 30/50 (lr=0.0001), train loss 0.00254, valid loss 0.00320, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:36:32 Model performance:
+2026-01-22 13:36:32   metrics/test.rmse:          44.10
+2026-01-22 13:36:32   metrics/test.rmse_pcutoff:   5.37
+2026-01-22 13:36:32   metrics/test.mAP:           36.34
+2026-01-22 13:36:32   metrics/test.mAR:           41.43
+2026-01-22 13:37:12 Epoch 31/50 (lr=0.0001), train loss 0.00261, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:37:51 Epoch 32/50 (lr=0.0001), train loss 0.00249, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:38:30 Epoch 33/50 (lr=0.0001), train loss 0.00282, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:39:09 Epoch 34/50 (lr=0.0001), train loss 0.00278, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:39:49 Epoch 35/50 (lr=0.0001), train loss 0.00240, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:40:28 Epoch 36/50 (lr=0.0001), train loss 0.00232, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:41:08 Epoch 37/50 (lr=0.0001), train loss 0.00227, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:41:46 Epoch 38/50 (lr=0.0001), train loss 0.00227, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:42:25 Epoch 39/50 (lr=0.0001), train loss 0.00211, GPU: 14250.0/15095.1 MiB
+2026-01-22 13:43:04 Training for epoch 40 done, starting evaluation
+2026-01-25 06:03:28 Training with configuration:
+2026-01-25 06:03:29 data:
+2026-01-25 06:03:29   bbox_margin: 20
+2026-01-25 06:03:29   colormode: RGB
+2026-01-25 06:03:29   inference:
+2026-01-25 06:03:29     resize:
+2026-01-25 06:03:29       width: 1296
+2026-01-25 06:03:29       height: 972
+2026-01-25 06:03:29     normalize_images: True
+2026-01-25 06:03:29     auto_padding:
+2026-01-25 06:03:29       pad_width_divisor: 32
+2026-01-25 06:03:29       pad_height_divisor: 32
+2026-01-25 06:03:29   train:
+2026-01-25 06:03:29     resize:
+2026-01-25 06:03:29       width: 1296
+2026-01-25 06:03:29       height: 972
+2026-01-25 06:03:29     affine:
+2026-01-25 06:03:29       p: 0.5
+2026-01-25 06:03:29       rotation: 30
+2026-01-25 06:03:29       scaling: [0.5, 1.25]
+2026-01-25 06:03:29       translation: 0
+2026-01-25 06:03:29     crop_sampling:
+2026-01-25 06:03:29       width: 488
+2026-01-25 06:03:29       height: 488
+2026-01-25 06:03:29       max_shift: 0.4
+2026-01-25 06:03:29       method: hybrid
+2026-01-25 06:03:29     gaussian_noise: 12.75
+2026-01-25 06:03:29     motion_blur: True
+2026-01-25 06:03:29     normalize_images: True
+2026-01-25 06:03:29     auto_padding:
+2026-01-25 06:03:29       pad_width_divisor: 32
+2026-01-25 06:03:29       pad_height_divisor: 32
+2026-01-25 06:03:29 device: auto
+2026-01-25 06:03:29 inference:
+2026-01-25 06:03:29   multithreading:
+2026-01-25 06:03:29     enabled: True
+2026-01-25 06:03:29     queue_length: 4
+2026-01-25 06:03:29     timeout: 30.0
+2026-01-25 06:03:29   compile:
+2026-01-25 06:03:29     enabled: False
+2026-01-25 06:03:29     backend: inductor
+2026-01-25 06:03:29   autocast:
+2026-01-25 06:03:29     enabled: False
+2026-01-25 06:03:29 metadata:
+2026-01-25 06:03:29   project_path: /content/drive/MyDrive/pigs-heart-rate-top-dlc-2026-01-20
+2026-01-25 06:03:29   pose_config_path: /content/drive/MyDrive/pigs-heart-rate-top-dlc-2026-01-20/dlc-models-pytorch/iteration-0/pigs-heart-rate-topJan20-trainset95shuffle7/train/pytorch_config.yaml
+2026-01-25 06:03:29   bodyparts: ['L ear base', 'R ear base', 'Mid snout', 'Ext occipital protuberance']
+2026-01-25 06:03:29   unique_bodyparts: []
+2026-01-25 06:03:29   individuals: ['animal']
+2026-01-25 06:03:29   with_identity: None
+2026-01-25 06:03:29 method: bu
+2026-01-25 06:03:29 model:
+2026-01-25 06:03:29   backbone:
+2026-01-25 06:03:29     type: HRNet
+2026-01-25 06:03:29     model_name: hrnet_w32
+2026-01-25 06:03:29     freeze_bn_stats: True
+2026-01-25 06:03:29     freeze_bn_weights: False
+2026-01-25 06:03:29     interpolate_branches: False
+2026-01-25 06:03:29     increased_channel_count: False
+2026-01-25 06:03:29   backbone_output_channels: 32
+2026-01-25 06:03:29   heads:
+2026-01-25 06:03:29     bodypart:
+2026-01-25 06:03:29       type: HeatmapHead
+2026-01-25 06:03:29       weight_init: normal
+2026-01-25 06:03:29       predictor:
+2026-01-25 06:03:29         type: HeatmapPredictor
+2026-01-25 06:03:29         apply_sigmoid: False
+2026-01-25 06:03:29         clip_scores: True
+2026-01-25 06:03:29         location_refinement: True
+2026-01-25 06:03:29         locref_std: 7.2801
+2026-01-25 06:03:29       target_generator:
+2026-01-25 06:03:29         type: HeatmapGaussianGenerator
+2026-01-25 06:03:29         num_heatmaps: 4
+2026-01-25 06:03:29         pos_dist_thresh: 17
+2026-01-25 06:03:29         heatmap_mode: KEYPOINT
+2026-01-25 06:03:29         gradient_masking: False
+2026-01-25 06:03:29         generate_locref: True
+2026-01-25 06:03:29         locref_std: 7.2801
+2026-01-25 06:03:29       criterion:
+2026-01-25 06:03:29         heatmap:
+2026-01-25 06:03:29           type: WeightedMSECriterion
+2026-01-25 06:03:29           weight: 1.0
+2026-01-25 06:03:29         locref:
+2026-01-25 06:03:29           type: WeightedHuberCriterion
+2026-01-25 06:03:29           weight: 0.05
+2026-01-25 06:03:29       heatmap_config:
+2026-01-25 06:03:29         channels: [32, 4]
+2026-01-25 06:03:29         kernel_size: [3]
+2026-01-25 06:03:29         strides: [2]
+2026-01-25 06:03:29       locref_config:
+2026-01-25 06:03:29         channels: [32, 8]
+2026-01-25 06:03:29         kernel_size: [3]
+2026-01-25 06:03:29         strides: [2]
+2026-01-25 06:03:29 net_type: hrnet_w32
+2026-01-25 06:03:29 runner:
+2026-01-25 06:03:29   type: PoseTrainingRunner
+2026-01-25 06:03:29   gpus: None
+2026-01-25 06:03:29   key_metric: test.mAP
+2026-01-25 06:03:29   key_metric_asc: True
+2026-01-25 06:03:29   eval_interval: 10
+2026-01-25 06:03:29   optimizer:
+2026-01-25 06:03:29     type: AdamW
+2026-01-25 06:03:29     params:
+2026-01-25 06:03:29       lr: 0.0001
+2026-01-25 06:03:29   scheduler:
+2026-01-25 06:03:29     type: LRListScheduler
+2026-01-25 06:03:29     params:
+2026-01-25 06:03:29       lr_list: [[1e-05], [1e-06]]
+2026-01-25 06:03:29       milestones: [160, 190]
+2026-01-25 06:03:29   snapshots:
+2026-01-25 06:03:29     max_snapshots: 5
+2026-01-25 06:03:29     save_epochs: 5
+2026-01-25 06:03:29     save_optimizer_state: False
+2026-01-25 06:03:29 train_settings:
+2026-01-25 06:03:29   batch_size: 16
+2026-01-25 06:03:29   dataloader_workers: 0
+2026-01-25 06:03:29   dataloader_pin_memory: False
+2026-01-25 06:03:29   display_iters: 500
+2026-01-25 06:03:29   epochs: 50
+2026-01-25 06:03:29   seed: 42
+2026-01-25 06:03:36 Data Transforms:
+2026-01-25 06:03:36   Training:   Compose([
+  KeepAspectRatioResize(always_apply=True, p=1.0, height=972, width=1296, mode='pad', interpolation=1),
+  PadIfNeeded(always_apply=False, p=1.0, min_height=972, min_width=1296, pad_height_divisor=None, pad_width_divisor=None, position=PositionType.TOP_LEFT, border_mode=0, value=None, mask_value=None),
+  Affine(always_apply=False, p=0.5, interpolation=1, mask_interpolation=0, cval=0, mode=0, scale={'x': (0.5, 1.25), 'y': (0.5, 1.25)}, translate_percent=None, translate_px={'x': (0, 0), 'y': (0, 0)}, rotate=(-30, 30), fit_output=False, shear={'x': (0.0, 0.0), 'y': (0.0, 0.0)}, cval_mask=0, keep_ratio=True, rotate_method='largest_box'),
+  PadIfNeeded(always_apply=True, p=1.0, min_height=488, min_width=488, pad_height_divisor=None, pad_width_divisor=None, position=PositionType.CENTER, border_mode=0, value=None, mask_value=None),
+  KeypointAwareCrop(always_apply=True, p=1.0, width=488, height=488, max_shift=0.4, crop_sampling='hybrid'),
+  MotionBlur(always_apply=False, p=0.5, blur_limit=(3, 7), allow_shifted=True),
+  GaussNoise(always_apply=False, p=0.5, var_limit=(0, 162.5625), per_channel=True, mean=0),
+  PadIfNeeded(always_apply=False, p=1.0, min_height=None, min_width=None, pad_height_divisor=32, pad_width_divisor=32, position=PositionType.RANDOM, border_mode=4, value=None, mask_value=None),
+  Normalize(always_apply=False, p=1.0, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], max_pixel_value=255.0),
+], p=1.0, bbox_params={'format': 'coco', 'label_fields': ['bbox_labels'], 'min_area': 0.0, 'min_visibility': 0.0, 'min_width': 0.0, 'min_height': 0.0, 'check_each_transform': True}, keypoint_params={'format': 'xy', 'label_fields': ['class_labels'], 'remove_invisible': False, 'angle_in_degrees': True, 'check_each_transform': True}, additional_targets={}, is_check_shapes=True)
+2026-01-25 06:03:36   Validation: Compose([
+  KeepAspectRatioResize(always_apply=True, p=1.0, height=972, width=1296, mode='pad', interpolation=1),
+  PadIfNeeded(always_apply=False, p=1.0, min_height=972, min_width=1296, pad_height_divisor=None, pad_width_divisor=None, position=PositionType.TOP_LEFT, border_mode=0, value=None, mask_value=None),
+  PadIfNeeded(always_apply=False, p=1.0, min_height=None, min_width=None, pad_height_divisor=32, pad_width_divisor=32, position=PositionType.RANDOM, border_mode=4, value=None, mask_value=None),
+  Normalize(always_apply=False, p=1.0, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], max_pixel_value=255.0),
+], p=1.0, bbox_params={'format': 'coco', 'label_fields': ['bbox_labels'], 'min_area': 0.0, 'min_visibility': 0.0, 'min_width': 0.0, 'min_height': 0.0, 'check_each_transform': True}, keypoint_params={'format': 'xy', 'label_fields': ['class_labels'], 'remove_invisible': False, 'angle_in_degrees': True, 'check_each_transform': True}, additional_targets={}, is_check_shapes=True)
+2026-01-25 06:05:32 
+Note: According to your model configuration, you're training with batch size 1 and/or ``freeze_bn_stats=false``. This is not an optimal setting if you have powerful GPUs.
+This is good for small batch sizes (e.g., when training on a CPU), where you should keep ``freeze_bn_stats=true``.
+If you're using a GPU to train, you can obtain faster performance by setting a larger batch size (the biggest power of 2 where you don't geta CUDA out-of-memory error, such as 8, 16, 32 or 64 depending on the model, size of your images, and GPU memory) and ``freeze_bn_stats=false`` for the backbone of your model. 
+This also allows you to increase the learning rate (empirically you can scale the learning rate by sqrt(batch_size) times).
+
+2026-01-25 06:05:32 Using 123 images and 7 for testing
+2026-01-25 06:05:32 
+Starting pose model training...
+--------------------------------------------------
+2026-01-25 06:08:46 Epoch 31/80 (lr=0.0001), train loss 0.00343, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:09:25 Epoch 32/80 (lr=0.0001), train loss 0.00291, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:10:04 Epoch 33/80 (lr=0.0001), train loss 0.00257, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:10:44 Epoch 34/80 (lr=0.0001), train loss 0.00257, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:11:32 Epoch 35/80 (lr=0.0001), train loss 0.00244, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:12:15 Epoch 36/80 (lr=0.0001), train loss 0.00265, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:12:55 Epoch 37/80 (lr=0.0001), train loss 0.00207, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:13:34 Epoch 38/80 (lr=0.0001), train loss 0.00215, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:14:14 Epoch 39/80 (lr=0.0001), train loss 0.00219, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:14:53 Training for epoch 40 done, starting evaluation
+2026-01-25 06:15:06 Epoch 40/80 (lr=0.0001), train loss 0.00220, valid loss 0.00241, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:15:06 Model performance:
+2026-01-25 06:15:06   metrics/test.rmse:          43.21
+2026-01-25 06:15:06   metrics/test.rmse_pcutoff:   4.49
+2026-01-25 06:15:06   metrics/test.mAP:           41.68
+2026-01-25 06:15:06   metrics/test.mAR:           51.43
+2026-01-25 06:15:46 Epoch 41/80 (lr=0.0001), train loss 0.00205, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:16:25 Epoch 42/80 (lr=0.0001), train loss 0.00205, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:17:05 Epoch 43/80 (lr=0.0001), train loss 0.00192, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:17:44 Epoch 44/80 (lr=0.0001), train loss 0.00222, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:18:25 Epoch 45/80 (lr=0.0001), train loss 0.00198, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:19:04 Epoch 46/80 (lr=0.0001), train loss 0.00205, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:19:44 Epoch 47/80 (lr=0.0001), train loss 0.00214, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:20:24 Epoch 48/80 (lr=0.0001), train loss 0.00178, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:21:03 Epoch 49/80 (lr=0.0001), train loss 0.00190, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:21:43 Training for epoch 50 done, starting evaluation
+2026-01-25 06:21:46 Epoch 50/80 (lr=0.0001), train loss 0.00180, valid loss 0.00223, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:21:46 Model performance:
+2026-01-25 06:21:46   metrics/test.rmse:          16.59
+2026-01-25 06:21:46   metrics/test.rmse_pcutoff:   4.03
+2026-01-25 06:21:46   metrics/test.mAP:           48.76
+2026-01-25 06:21:46   metrics/test.mAR:           57.14
+2026-01-25 06:22:26 Epoch 51/80 (lr=0.0001), train loss 0.00183, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:23:06 Epoch 52/80 (lr=0.0001), train loss 0.00157, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:23:46 Epoch 53/80 (lr=0.0001), train loss 0.00179, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:24:25 Epoch 54/80 (lr=0.0001), train loss 0.00160, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:25:05 Epoch 55/80 (lr=0.0001), train loss 0.00156, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:25:45 Epoch 56/80 (lr=0.0001), train loss 0.00156, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:26:25 Epoch 57/80 (lr=0.0001), train loss 0.00168, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:27:04 Epoch 58/80 (lr=0.0001), train loss 0.00177, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:27:43 Epoch 59/80 (lr=0.0001), train loss 0.00188, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:28:22 Training for epoch 60 done, starting evaluation
+2026-01-25 06:28:25 Epoch 60/80 (lr=0.0001), train loss 0.00163, valid loss 0.00409, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:28:25 Model performance:
+2026-01-25 06:28:25   metrics/test.rmse:          19.76
+2026-01-25 06:28:25   metrics/test.rmse_pcutoff:   6.38
+2026-01-25 06:28:25   metrics/test.mAP:           36.68
+2026-01-25 06:28:25   metrics/test.mAR:           38.57
+2026-01-25 06:29:05 Epoch 61/80 (lr=0.0001), train loss 0.00180, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:29:44 Epoch 62/80 (lr=0.0001), train loss 0.00179, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:30:24 Epoch 63/80 (lr=0.0001), train loss 0.00200, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:31:04 Epoch 64/80 (lr=0.0001), train loss 0.00178, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:31:43 Epoch 65/80 (lr=0.0001), train loss 0.00165, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:32:24 Epoch 66/80 (lr=0.0001), train loss 0.00164, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:33:03 Epoch 67/80 (lr=0.0001), train loss 0.00182, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:33:43 Epoch 68/80 (lr=0.0001), train loss 0.00171, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:34:23 Epoch 69/80 (lr=0.0001), train loss 0.00156, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:35:03 Training for epoch 70 done, starting evaluation
+2026-01-25 06:35:06 Epoch 70/80 (lr=0.0001), train loss 0.00164, valid loss 0.00273, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:35:06 Model performance:
+2026-01-25 06:35:06   metrics/test.rmse:          13.06
+2026-01-25 06:35:06   metrics/test.rmse_pcutoff:   3.41
+2026-01-25 06:35:06   metrics/test.mAP:           56.53
+2026-01-25 06:35:06   metrics/test.mAR:           61.43
+2026-01-25 06:35:45 Epoch 71/80 (lr=0.0001), train loss 0.00167, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:36:25 Epoch 72/80 (lr=0.0001), train loss 0.00149, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:37:05 Epoch 73/80 (lr=0.0001), train loss 0.00144, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:37:45 Epoch 74/80 (lr=0.0001), train loss 0.00156, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:38:26 Epoch 75/80 (lr=0.0001), train loss 0.00153, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:39:06 Epoch 76/80 (lr=0.0001), train loss 0.00160, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:39:46 Epoch 77/80 (lr=0.0001), train loss 0.00162, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:40:26 Epoch 78/80 (lr=0.0001), train loss 0.00196, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:41:05 Epoch 79/80 (lr=0.0001), train loss 0.00192, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:41:45 Training for epoch 80 done, starting evaluation
+2026-01-25 06:41:49 Epoch 80/80 (lr=0.0001), train loss 0.00159, valid loss 0.00282, GPU: 13924.0/15095.1 MiB
+2026-01-25 06:41:49 Model performance:
+2026-01-25 06:41:49   metrics/test.rmse:          14.66
+2026-01-25 06:41:49   metrics/test.rmse_pcutoff:   4.38
+2026-01-25 06:41:49   metrics/test.mAP:           46.22
+2026-01-25 06:41:49   metrics/test.mAR:           58.57
+2026-01-25 07:16:48 Training with configuration:
+2026-01-25 07:16:48 data:
+2026-01-25 07:16:48   bbox_margin: 20
+2026-01-25 07:16:48   colormode: RGB
+2026-01-25 07:16:48   inference:
+2026-01-25 07:16:48     resize:
+2026-01-25 07:16:48       width: 1296
+2026-01-25 07:16:48       height: 972
+2026-01-25 07:16:48     normalize_images: True
+2026-01-25 07:16:48     auto_padding:
+2026-01-25 07:16:48       pad_width_divisor: 32
+2026-01-25 07:16:48       pad_height_divisor: 32
+2026-01-25 07:16:48   train:
+2026-01-25 07:16:48     resize:
+2026-01-25 07:16:48       width: 1296
+2026-01-25 07:16:48       height: 972
+2026-01-25 07:16:48     affine:
+2026-01-25 07:16:48       p: 0.5
+2026-01-25 07:16:48       rotation: 30
+2026-01-25 07:16:48       scaling: [0.5, 1.25]
+2026-01-25 07:16:48       translation: 0
+2026-01-25 07:16:48     crop_sampling:
+2026-01-25 07:16:48       width: 488
+2026-01-25 07:16:48       height: 488
+2026-01-25 07:16:48       max_shift: 0.4
+2026-01-25 07:16:48       method: hybrid
+2026-01-25 07:16:48     gaussian_noise: 12.75
+2026-01-25 07:16:48     motion_blur: True
+2026-01-25 07:16:48     normalize_images: True
+2026-01-25 07:16:48     auto_padding:
+2026-01-25 07:16:48       pad_width_divisor: 32
+2026-01-25 07:16:48       pad_height_divisor: 32
+2026-01-25 07:16:48 device: auto
+2026-01-25 07:16:48 inference:
+2026-01-25 07:16:48   multithreading:
+2026-01-25 07:16:48     enabled: True
+2026-01-25 07:16:48     queue_length: 4
+2026-01-25 07:16:48     timeout: 30.0
+2026-01-25 07:16:48   compile:
+2026-01-25 07:16:48     enabled: False
+2026-01-25 07:16:48     backend: inductor
+2026-01-25 07:16:48   autocast:
+2026-01-25 07:16:48     enabled: False
+2026-01-25 07:16:48 metadata:
+2026-01-25 07:16:48   project_path: /content/drive/MyDrive/pigs-heart-rate-top-dlc-2026-01-20
+2026-01-25 07:16:48   pose_config_path: /content/drive/MyDrive/pigs-heart-rate-top-dlc-2026-01-20/dlc-models-pytorch/iteration-0/pigs-heart-rate-topJan20-trainset95shuffle7/train/pytorch_config.yaml
+2026-01-25 07:16:48   bodyparts: ['L ear base', 'R ear base', 'Mid snout', 'Ext occipital protuberance']
+2026-01-25 07:16:48   unique_bodyparts: []
+2026-01-25 07:16:48   individuals: ['animal']
+2026-01-25 07:16:48   with_identity: None
+2026-01-25 07:16:48 method: bu
+2026-01-25 07:16:48 model:
+2026-01-25 07:16:48   backbone:
+2026-01-25 07:16:48     type: HRNet
+2026-01-25 07:16:48     model_name: hrnet_w32
+2026-01-25 07:16:48     freeze_bn_stats: True
+2026-01-25 07:16:48     freeze_bn_weights: False
+2026-01-25 07:16:48     interpolate_branches: False
+2026-01-25 07:16:48     increased_channel_count: False
+2026-01-25 07:16:48   backbone_output_channels: 32
+2026-01-25 07:16:48   heads:
+2026-01-25 07:16:48     bodypart:
+2026-01-25 07:16:48       type: HeatmapHead
+2026-01-25 07:16:48       weight_init: normal
+2026-01-25 07:16:48       predictor:
+2026-01-25 07:16:48         type: HeatmapPredictor
+2026-01-25 07:16:48         apply_sigmoid: False
+2026-01-25 07:16:48         clip_scores: True
+2026-01-25 07:16:48         location_refinement: True
+2026-01-25 07:16:48         locref_std: 7.2801
+2026-01-25 07:16:48       target_generator:
+2026-01-25 07:16:48         type: HeatmapGaussianGenerator
+2026-01-25 07:16:48         num_heatmaps: 4
+2026-01-25 07:16:48         pos_dist_thresh: 17
+2026-01-25 07:16:48         heatmap_mode: KEYPOINT
+2026-01-25 07:16:48         gradient_masking: False
+2026-01-25 07:16:48         generate_locref: True
+2026-01-25 07:16:48         locref_std: 7.2801
+2026-01-25 07:16:48       criterion:
+2026-01-25 07:16:48         heatmap:
+2026-01-25 07:16:48           type: WeightedMSECriterion
+2026-01-25 07:16:48           weight: 1.0
+2026-01-25 07:16:48         locref:
+2026-01-25 07:16:48           type: WeightedHuberCriterion
+2026-01-25 07:16:48           weight: 0.05
+2026-01-25 07:16:48       heatmap_config:
+2026-01-25 07:16:48         channels: [32, 4]
+2026-01-25 07:16:48         kernel_size: [3]
+2026-01-25 07:16:48         strides: [2]
+2026-01-25 07:16:48       locref_config:
+2026-01-25 07:16:48         channels: [32, 8]
+2026-01-25 07:16:48         kernel_size: [3]
+2026-01-25 07:16:48         strides: [2]
+2026-01-25 07:16:48 net_type: hrnet_w32
+2026-01-25 07:16:48 runner:
+2026-01-25 07:16:48   type: PoseTrainingRunner
+2026-01-25 07:16:48   gpus: None
+2026-01-25 07:16:48   key_metric: test.mAP
+2026-01-25 07:16:48   key_metric_asc: True
+2026-01-25 07:16:48   eval_interval: 10
+2026-01-25 07:16:48   optimizer:
+2026-01-25 07:16:48     type: AdamW
+2026-01-25 07:16:48     params:
+2026-01-25 07:16:48       lr: 0.0001
+2026-01-25 07:16:48   scheduler:
+2026-01-25 07:16:48     type: LRListScheduler
+2026-01-25 07:16:48     params:
+2026-01-25 07:16:48       lr_list: [[1e-05], [1e-06]]
+2026-01-25 07:16:48       milestones: [160, 190]
+2026-01-25 07:16:48   snapshots:
+2026-01-25 07:16:48     max_snapshots: 5
+2026-01-25 07:16:48     save_epochs: 5
+2026-01-25 07:16:48     save_optimizer_state: False
+2026-01-25 07:16:48 train_settings:
+2026-01-25 07:16:48   batch_size: 16
+2026-01-25 07:16:48   dataloader_workers: 0
+2026-01-25 07:16:48   dataloader_pin_memory: False
+2026-01-25 07:16:48   display_iters: 500
+2026-01-25 07:16:48   epochs: 120
+2026-01-25 07:16:48   seed: 42
+2026-01-25 07:16:50 Data Transforms:
+2026-01-25 07:16:50   Training:   Compose([
+  KeepAspectRatioResize(always_apply=True, p=1.0, height=972, width=1296, mode='pad', interpolation=1),
+  PadIfNeeded(always_apply=False, p=1.0, min_height=972, min_width=1296, pad_height_divisor=None, pad_width_divisor=None, position=PositionType.TOP_LEFT, border_mode=0, value=None, mask_value=None),
+  Affine(always_apply=False, p=0.5, interpolation=1, mask_interpolation=0, cval=0, mode=0, scale={'x': (0.5, 1.25), 'y': (0.5, 1.25)}, translate_percent=None, translate_px={'x': (0, 0), 'y': (0, 0)}, rotate=(-30, 30), fit_output=False, shear={'x': (0.0, 0.0), 'y': (0.0, 0.0)}, cval_mask=0, keep_ratio=True, rotate_method='largest_box'),
+  PadIfNeeded(always_apply=True, p=1.0, min_height=488, min_width=488, pad_height_divisor=None, pad_width_divisor=None, position=PositionType.CENTER, border_mode=0, value=None, mask_value=None),
+  KeypointAwareCrop(always_apply=True, p=1.0, width=488, height=488, max_shift=0.4, crop_sampling='hybrid'),
+  MotionBlur(always_apply=False, p=0.5, blur_limit=(3, 7), allow_shifted=True),
+  GaussNoise(always_apply=False, p=0.5, var_limit=(0, 162.5625), per_channel=True, mean=0),
+  PadIfNeeded(always_apply=False, p=1.0, min_height=None, min_width=None, pad_height_divisor=32, pad_width_divisor=32, position=PositionType.RANDOM, border_mode=4, value=None, mask_value=None),
+  Normalize(always_apply=False, p=1.0, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], max_pixel_value=255.0),
+], p=1.0, bbox_params={'format': 'coco', 'label_fields': ['bbox_labels'], 'min_area': 0.0, 'min_visibility': 0.0, 'min_width': 0.0, 'min_height': 0.0, 'check_each_transform': True}, keypoint_params={'format': 'xy', 'label_fields': ['class_labels'], 'remove_invisible': False, 'angle_in_degrees': True, 'check_each_transform': True}, additional_targets={}, is_check_shapes=True)
+2026-01-25 07:16:50   Validation: Compose([
+  KeepAspectRatioResize(always_apply=True, p=1.0, height=972, width=1296, mode='pad', interpolation=1),
+  PadIfNeeded(always_apply=False, p=1.0, min_height=972, min_width=1296, pad_height_divisor=None, pad_width_divisor=None, position=PositionType.TOP_LEFT, border_mode=0, value=None, mask_value=None),
+  PadIfNeeded(always_apply=False, p=1.0, min_height=None, min_width=None, pad_height_divisor=32, pad_width_divisor=32, position=PositionType.RANDOM, border_mode=4, value=None, mask_value=None),
+  Normalize(always_apply=False, p=1.0, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], max_pixel_value=255.0),
+], p=1.0, bbox_params={'format': 'coco', 'label_fields': ['bbox_labels'], 'min_area': 0.0, 'min_visibility': 0.0, 'min_width': 0.0, 'min_height': 0.0, 'check_each_transform': True}, keypoint_params={'format': 'xy', 'label_fields': ['class_labels'], 'remove_invisible': False, 'angle_in_degrees': True, 'check_each_transform': True}, additional_targets={}, is_check_shapes=True)
+2026-01-25 07:16:50 
+Note: According to your model configuration, you're training with batch size 1 and/or ``freeze_bn_stats=false``. This is not an optimal setting if you have powerful GPUs.
+This is good for small batch sizes (e.g., when training on a CPU), where you should keep ``freeze_bn_stats=true``.
+If you're using a GPU to train, you can obtain faster performance by setting a larger batch size (the biggest power of 2 where you don't geta CUDA out-of-memory error, such as 8, 16, 32 or 64 depending on the model, size of your images, and GPU memory) and ``freeze_bn_stats=false`` for the backbone of your model. 
+This also allows you to increase the learning rate (empirically you can scale the learning rate by sqrt(batch_size) times).
+
+2026-01-25 07:16:50 Using 123 images and 7 for testing
+2026-01-25 07:16:50 
+Starting pose model training...
+--------------------------------------------------
+2026-01-25 07:17:29 Epoch 71/190 (lr=0.0001), train loss 0.00263, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:18:10 Epoch 72/190 (lr=0.0001), train loss 0.00193, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:18:49 Epoch 73/190 (lr=0.0001), train loss 0.00170, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:19:30 Epoch 74/190 (lr=0.0001), train loss 0.00164, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:20:11 Epoch 75/190 (lr=0.0001), train loss 0.00148, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:20:54 Epoch 76/190 (lr=0.0001), train loss 0.00150, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:21:35 Epoch 77/190 (lr=0.0001), train loss 0.00121, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:22:16 Epoch 78/190 (lr=0.0001), train loss 0.00120, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:22:56 Epoch 79/190 (lr=0.0001), train loss 0.00134, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:23:36 Training for epoch 80 done, starting evaluation
+2026-01-25 07:23:40 Epoch 80/190 (lr=0.0001), train loss 0.00120, valid loss 0.00232, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:23:40 Model performance:
+2026-01-25 07:23:40   metrics/test.rmse:           8.52
+2026-01-25 07:23:40   metrics/test.rmse_pcutoff:   3.18
+2026-01-25 07:23:40   metrics/test.mAP:           70.98
+2026-01-25 07:23:40   metrics/test.mAR:           77.14
+2026-01-25 07:24:24 Epoch 81/190 (lr=0.0001), train loss 0.00127, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:25:03 Epoch 82/190 (lr=0.0001), train loss 0.00133, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:25:43 Epoch 83/190 (lr=0.0001), train loss 0.00127, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:26:23 Epoch 84/190 (lr=0.0001), train loss 0.00144, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:27:03 Epoch 85/190 (lr=0.0001), train loss 0.00122, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:27:44 Epoch 86/190 (lr=0.0001), train loss 0.00143, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:28:24 Epoch 87/190 (lr=0.0001), train loss 0.00151, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:29:03 Epoch 88/190 (lr=0.0001), train loss 0.00131, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:29:43 Epoch 89/190 (lr=0.0001), train loss 0.00132, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:30:22 Training for epoch 90 done, starting evaluation
+2026-01-25 07:30:25 Epoch 90/190 (lr=0.0001), train loss 0.00123, valid loss 0.00248, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:30:25 Model performance:
+2026-01-25 07:30:25   metrics/test.rmse:          12.19
+2026-01-25 07:30:25   metrics/test.rmse_pcutoff:   4.48
+2026-01-25 07:30:25   metrics/test.mAP:           58.35
+2026-01-25 07:30:25   metrics/test.mAR:           61.43
+2026-01-25 07:31:06 Epoch 91/190 (lr=0.0001), train loss 0.00136, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:31:45 Epoch 92/190 (lr=0.0001), train loss 0.00111, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:32:25 Epoch 93/190 (lr=0.0001), train loss 0.00119, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:33:04 Epoch 94/190 (lr=0.0001), train loss 0.00119, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:33:45 Epoch 95/190 (lr=0.0001), train loss 0.00125, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:34:25 Epoch 96/190 (lr=0.0001), train loss 0.00132, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:35:05 Epoch 97/190 (lr=0.0001), train loss 0.00142, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:35:45 Epoch 98/190 (lr=0.0001), train loss 0.00164, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:36:24 Epoch 99/190 (lr=0.0001), train loss 0.00179, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:37:04 Training for epoch 100 done, starting evaluation
+2026-01-25 07:37:07 Epoch 100/190 (lr=0.0001), train loss 0.00160, valid loss 0.00490, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:37:07 Model performance:
+2026-01-25 07:37:07   metrics/test.rmse:          14.53
+2026-01-25 07:37:07   metrics/test.rmse_pcutoff:   6.70
+2026-01-25 07:37:07   metrics/test.mAP:           56.20
+2026-01-25 07:37:07   metrics/test.mAR:           57.14
+2026-01-25 07:37:47 Epoch 101/190 (lr=0.0001), train loss 0.00170, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:38:27 Epoch 102/190 (lr=0.0001), train loss 0.00155, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:39:07 Epoch 103/190 (lr=0.0001), train loss 0.00148, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:39:47 Epoch 104/190 (lr=0.0001), train loss 0.00141, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:40:27 Epoch 105/190 (lr=0.0001), train loss 0.00107, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:41:08 Epoch 106/190 (lr=0.0001), train loss 0.00124, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:41:49 Epoch 107/190 (lr=0.0001), train loss 0.00114, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:42:30 Epoch 108/190 (lr=0.0001), train loss 0.00116, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:43:09 Epoch 109/190 (lr=0.0001), train loss 0.00115, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:43:49 Training for epoch 110 done, starting evaluation
+2026-01-25 07:43:53 Epoch 110/190 (lr=0.0001), train loss 0.00131, valid loss 0.00309, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:43:53 Model performance:
+2026-01-25 07:43:53   metrics/test.rmse:          10.50
+2026-01-25 07:43:53   metrics/test.rmse_pcutoff:   4.82
+2026-01-25 07:43:53   metrics/test.mAP:           66.20
+2026-01-25 07:43:53   metrics/test.mAR:           67.14
+2026-01-25 07:44:33 Epoch 111/190 (lr=0.0001), train loss 0.00145, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:45:13 Epoch 112/190 (lr=0.0001), train loss 0.00139, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:45:55 Epoch 113/190 (lr=0.0001), train loss 0.00148, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:46:36 Epoch 114/190 (lr=0.0001), train loss 0.00144, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:47:16 Epoch 115/190 (lr=0.0001), train loss 0.00144, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:47:57 Epoch 116/190 (lr=0.0001), train loss 0.00146, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:48:37 Epoch 117/190 (lr=0.0001), train loss 0.00140, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:49:16 Epoch 118/190 (lr=0.0001), train loss 0.00148, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:49:56 Epoch 119/190 (lr=0.0001), train loss 0.00150, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:50:36 Training for epoch 120 done, starting evaluation
+2026-01-25 07:50:39 Epoch 120/190 (lr=0.0001), train loss 0.00122, valid loss 0.00358, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:50:39 Model performance:
+2026-01-25 07:50:39   metrics/test.rmse:          15.25
+2026-01-25 07:50:39   metrics/test.rmse_pcutoff:   4.91
+2026-01-25 07:50:39   metrics/test.mAP:           51.76
+2026-01-25 07:50:39   metrics/test.mAR:           52.86
+2026-01-25 07:51:19 Epoch 121/190 (lr=0.0001), train loss 0.00143, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:51:59 Epoch 122/190 (lr=0.0001), train loss 0.00125, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:52:38 Epoch 123/190 (lr=0.0001), train loss 0.00142, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:53:17 Epoch 124/190 (lr=0.0001), train loss 0.00143, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:53:58 Epoch 125/190 (lr=0.0001), train loss 0.00118, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:54:37 Epoch 126/190 (lr=0.0001), train loss 0.00116, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:55:17 Epoch 127/190 (lr=0.0001), train loss 0.00129, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:55:56 Epoch 128/190 (lr=0.0001), train loss 0.00118, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:56:36 Epoch 129/190 (lr=0.0001), train loss 0.00113, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:57:16 Training for epoch 130 done, starting evaluation
+2026-01-25 07:57:19 Epoch 130/190 (lr=0.0001), train loss 0.00101, valid loss 0.00274, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:57:19 Model performance:
+2026-01-25 07:57:19   metrics/test.rmse:          19.87
+2026-01-25 07:57:19   metrics/test.rmse_pcutoff:   4.04
+2026-01-25 07:57:19   metrics/test.mAP:           55.52
+2026-01-25 07:57:19   metrics/test.mAR:           58.57
+2026-01-25 07:57:59 Epoch 131/190 (lr=0.0001), train loss 0.00145, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:58:39 Epoch 132/190 (lr=0.0001), train loss 0.00137, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:59:19 Epoch 133/190 (lr=0.0001), train loss 0.00137, GPU: 13226.0/15095.1 MiB
+2026-01-25 07:59:58 Epoch 134/190 (lr=0.0001), train loss 0.00124, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:00:39 Epoch 135/190 (lr=0.0001), train loss 0.00128, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:01:19 Epoch 136/190 (lr=0.0001), train loss 0.00119, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:01:59 Epoch 137/190 (lr=0.0001), train loss 0.00136, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:02:39 Epoch 138/190 (lr=0.0001), train loss 0.00135, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:03:19 Epoch 139/190 (lr=0.0001), train loss 0.00111, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:03:59 Training for epoch 140 done, starting evaluation
+2026-01-25 08:04:02 Epoch 140/190 (lr=0.0001), train loss 0.00120, valid loss 0.00291, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:04:02 Model performance:
+2026-01-25 08:04:02   metrics/test.rmse:          12.04
+2026-01-25 08:04:02   metrics/test.rmse_pcutoff:   3.94
+2026-01-25 08:04:02   metrics/test.mAP:           57.07
+2026-01-25 08:04:02   metrics/test.mAR:           65.71
+2026-01-25 08:04:43 Epoch 141/190 (lr=0.0001), train loss 0.00119, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:05:23 Epoch 142/190 (lr=0.0001), train loss 0.00109, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:06:03 Epoch 143/190 (lr=0.0001), train loss 0.00120, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:06:43 Epoch 144/190 (lr=0.0001), train loss 0.00105, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:07:24 Epoch 145/190 (lr=0.0001), train loss 0.00104, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:08:04 Epoch 146/190 (lr=0.0001), train loss 0.00112, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:08:44 Epoch 147/190 (lr=0.0001), train loss 0.00107, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:09:23 Epoch 148/190 (lr=0.0001), train loss 0.00125, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:10:03 Epoch 149/190 (lr=0.0001), train loss 0.00121, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:10:42 Training for epoch 150 done, starting evaluation
+2026-01-25 08:10:46 Epoch 150/190 (lr=0.0001), train loss 0.00097, valid loss 0.00271, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:10:46 Model performance:
+2026-01-25 08:10:46   metrics/test.rmse:          12.18
+2026-01-25 08:10:46   metrics/test.rmse_pcutoff:   4.35
+2026-01-25 08:10:46   metrics/test.mAP:           55.10
+2026-01-25 08:10:46   metrics/test.mAR:           60.00
+2026-01-25 08:11:25 Epoch 151/190 (lr=0.0001), train loss 0.00095, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:12:04 Epoch 152/190 (lr=0.0001), train loss 0.00108, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:12:44 Epoch 153/190 (lr=0.0001), train loss 0.00105, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:13:23 Epoch 154/190 (lr=0.0001), train loss 0.00125, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:14:02 Epoch 155/190 (lr=0.0001), train loss 0.00108, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:14:42 Epoch 156/190 (lr=0.0001), train loss 0.00107, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:15:21 Epoch 157/190 (lr=0.0001), train loss 0.00110, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:16:00 Epoch 158/190 (lr=0.0001), train loss 0.00102, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:16:39 Epoch 159/190 (lr=0.0001), train loss 0.00096, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:17:18 Training for epoch 160 done, starting evaluation
+2026-01-25 08:17:21 Epoch 160/190 (lr=1e-05), train loss 0.00099, valid loss 0.00254, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:17:21 Model performance:
+2026-01-25 08:17:21   metrics/test.rmse:           4.75
+2026-01-25 08:17:21   metrics/test.rmse_pcutoff:   3.79
+2026-01-25 08:17:21   metrics/test.mAP:           84.90
+2026-01-25 08:17:21   metrics/test.mAR:           85.71
+2026-01-25 08:18:00 Epoch 161/190 (lr=1e-05), train loss 0.00102, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:18:39 Epoch 162/190 (lr=1e-05), train loss 0.00073, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:19:18 Epoch 163/190 (lr=1e-05), train loss 0.00078, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:19:57 Epoch 164/190 (lr=1e-05), train loss 0.00084, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:20:37 Epoch 165/190 (lr=1e-05), train loss 0.00079, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:21:16 Epoch 166/190 (lr=1e-05), train loss 0.00079, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:21:56 Epoch 167/190 (lr=1e-05), train loss 0.00078, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:22:36 Epoch 168/190 (lr=1e-05), train loss 0.00072, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:23:16 Epoch 169/190 (lr=1e-05), train loss 0.00068, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:23:55 Training for epoch 170 done, starting evaluation
+2026-01-25 08:23:59 Epoch 170/190 (lr=1e-05), train loss 0.00077, valid loss 0.00234, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:23:59 Model performance:
+2026-01-25 08:23:59   metrics/test.rmse:           4.37
+2026-01-25 08:23:59   metrics/test.rmse_pcutoff:   3.94
+2026-01-25 08:23:59   metrics/test.mAP:           87.89
+2026-01-25 08:23:59   metrics/test.mAR:           88.57
+2026-01-25 08:24:40 Epoch 171/190 (lr=1e-05), train loss 0.00077, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:25:20 Epoch 172/190 (lr=1e-05), train loss 0.00076, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:26:00 Epoch 173/190 (lr=1e-05), train loss 0.00076, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:26:39 Epoch 174/190 (lr=1e-05), train loss 0.00077, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:27:19 Epoch 175/190 (lr=1e-05), train loss 0.00062, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:27:59 Epoch 176/190 (lr=1e-05), train loss 0.00075, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:28:39 Epoch 177/190 (lr=1e-05), train loss 0.00073, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:29:19 Epoch 178/190 (lr=1e-05), train loss 0.00074, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:29:58 Epoch 179/190 (lr=1e-05), train loss 0.00066, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:30:38 Training for epoch 180 done, starting evaluation
+2026-01-25 08:30:41 Epoch 180/190 (lr=1e-05), train loss 0.00070, valid loss 0.00218, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:30:41 Model performance:
+2026-01-25 08:30:41   metrics/test.rmse:           4.21
+2026-01-25 08:30:41   metrics/test.rmse_pcutoff:   3.17
+2026-01-25 08:30:41   metrics/test.mAP:           88.61
+2026-01-25 08:30:41   metrics/test.mAR:           88.57
+2026-01-25 08:31:21 Epoch 181/190 (lr=1e-05), train loss 0.00067, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:32:00 Epoch 182/190 (lr=1e-05), train loss 0.00062, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:32:40 Epoch 183/190 (lr=1e-05), train loss 0.00064, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:33:20 Epoch 184/190 (lr=1e-05), train loss 0.00058, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:34:00 Epoch 185/190 (lr=1e-05), train loss 0.00070, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:34:40 Epoch 186/190 (lr=1e-05), train loss 0.00068, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:35:20 Epoch 187/190 (lr=1e-05), train loss 0.00059, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:35:59 Epoch 188/190 (lr=1e-05), train loss 0.00071, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:36:39 Epoch 189/190 (lr=1e-05), train loss 0.00072, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:37:19 Training for epoch 190 done, starting evaluation
+2026-01-25 08:37:22 Epoch 190/190 (lr=1e-06), train loss 0.00056, valid loss 0.00239, GPU: 13226.0/15095.1 MiB
+2026-01-25 08:37:22 Model performance:
+2026-01-25 08:37:22   metrics/test.rmse:           4.36
+2026-01-25 08:37:22   metrics/test.rmse_pcutoff:   3.86
+2026-01-25 08:37:22   metrics/test.mAP:           88.61
+2026-01-25 08:37:22   metrics/test.mAR:           88.57

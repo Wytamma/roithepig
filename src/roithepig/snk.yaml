@@ -1,12 +1,17 @@
 cli:
+  model:
+    type: str
+    required: true
+    choices:
+      - side
+      - top
+  bodypart:
+    type: str
+    help: Body part to focus on for cropping.
   video:
     type: path
     help: Path to the video file to be processed.
     required: true
-  bodypart:
-    type: str
-    help: Body part to focus on for cropping.
-    default: "L ear base"
   threshold:
     type: float
     help: Minimum likelihood threshold for body part detection.

@@ -1,0 +1,139 @@
+data:
+  bbox_margin: 20
+  colormode: RGB
+  inference:
+    # resize:
+    #   width: 1296
+    #   height: 972
+    normalize_images: true
+    auto_padding:
+      pad_width_divisor: 32
+      pad_height_divisor: 32
+  train:
+    resize:
+      width: 1296
+      height: 972
+    affine:
+      p: 0.5
+      rotation: 30
+      scaling:
+      - 0.5
+      - 1.25
+      translation: 0
+    crop_sampling:
+      width: 488
+      height: 488
+      max_shift: 0.4
+      method: hybrid
+    gaussian_noise: 12.75
+    motion_blur: true
+    normalize_images: true
+    auto_padding:
+      pad_width_divisor: 32
+      pad_height_divisor: 32
+device: auto
+inference:
+  multithreading:
+    enabled: true
+    queue_length: 4
+    timeout: 30.0
+  compile:
+    enabled: false
+    backend: inductor
+  autocast:
+    enabled: false
+metadata:
+  project_path: /content/drive/MyDrive/pigs-heart-rate-top-dlc-2026-01-20
+  pose_config_path: 
+    /content/drive/MyDrive/pigs-heart-rate-top-dlc-2026-01-20/dlc-models-pytorch/iteration-0/pigs-heart-rate-topJan20-trainset95shuffle7/train/pytorch_config.yaml
+  bodyparts:
+  - L ear base
+  - R ear base
+  - Mid snout
+  - Ext occipital protuberance
+  unique_bodyparts: []
+  individuals:
+  - animal
+  with_identity:
+method: bu
+model:
+  backbone:
+    type: HRNet
+    model_name: hrnet_w32
+    freeze_bn_stats: true
+    freeze_bn_weights: false
+    interpolate_branches: false
+    increased_channel_count: false
+  backbone_output_channels: 32
+  heads:
+    bodypart:
+      type: HeatmapHead
+      weight_init: normal
+      predictor:
+        type: HeatmapPredictor
+        apply_sigmoid: false
+        clip_scores: true
+        location_refinement: true
+        locref_std: 7.2801
+      target_generator:
+        type: HeatmapGaussianGenerator
+        num_heatmaps: 4
+        pos_dist_thresh: 17
+        heatmap_mode: KEYPOINT
+        gradient_masking: false
+        generate_locref: true
+        locref_std: 7.2801
+      criterion:
+        heatmap:
+          type: WeightedMSECriterion
+          weight: 1.0
+        locref:
+          type: WeightedHuberCriterion
+          weight: 0.05
+      heatmap_config:
+        channels:
+        - 32
+        - 4
+        kernel_size:
+        - 3
+        strides:
+        - 2
+      locref_config:
+        channels:
+        - 32
+        - 8
+        kernel_size:
+        - 3
+        strides:
+        - 2
+net_type: hrnet_w32
+runner:
+  type: PoseTrainingRunner
+  gpus:
+  key_metric: test.mAP
+  key_metric_asc: true
+  eval_interval: 10
+  optimizer:
+    type: AdamW
+    params:
+      lr: 0.0001
+  scheduler:
+    type: LRListScheduler
+    params:
+      lr_list:
+      - - 1e-05
+      - - 1e-06
+      milestones:
+      - 160
+      - 190
+  snapshots:
+    max_snapshots: 5
+    save_epochs: 5
+    save_optimizer_state: false
+train_settings:
+  batch_size: 16
+  dataloader_workers: 0
+  dataloader_pin_memory: false
+  display_iters: 500
+  epochs: 120
+  seed: 42

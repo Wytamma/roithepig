@@ -1,0 +1,16 @@
+dataset: /content/drive/MyDrive/pigs-heart-rate-top-dlc-2026-01-20
+dataset_type: multi-animal-imgaug
+num_joints: 4
+all_joints:
+- - 0
+- - 1
+- - 2
+- - 3
+all_joints_names:
+- L ear base
+- R ear base
+- Mid snout
+- Ext occipital protuberance
+net_type: hrnet_w32
+global_scale: 1
+scoremap_dir: test
