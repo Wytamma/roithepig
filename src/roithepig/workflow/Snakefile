@@ -78,14 +78,9 @@ rule deeplabcut:
         config = rules.update_config.output.config,
     output:
         csv = temp(DLC_CSV_DOWNSCALED),
-        # dlc_csv    = temp(str(POSE_OUTPUT) + ".csv"),
-        # dlc_full_pickle = temp(str(POSE_OUTPUT) + "_full.pickle"),
-        # dld_meta_pickle = temp(str(POSE_OUTPUT) + "_meta.pickle"),
-        # dlc_h5 = temp(str(POSE_OUTPUT) + ".h5"),  # DLC HDF5 file
-        # dlc_h5_filtered = temp(str(POSE_OUTPUT) + "_filtered.h5"),  # filtered HDF5 file
     params:
         output_dir = OUT_DIR / VIDEO_NAME,
-        dlc_csv_filtered = OUT_DIR / VIDEO_NAME / "*_filtered.csv",  # filtered CSV
+        dlc_csv_filtered_glob = OUT_DIR / VIDEO_NAME / "*_filtered.csv",  # filtered CSV
         cropping  = f"--cropping {config['cropping']}" if config['cropping'] else "",
         batch_size = config.get("batch_size", 2),  # number of frames to process in a single batch
         script    = SCRIPT_DIR / "run_deeplabcut.py",
@@ -99,7 +94,7 @@ rule deeplabcut:
             --batch-size {params.batch_size} \
             {params.cropping}
         # Move the filtered DLC CSV to our temp downscaled CSV path
-        mv "{params.dlc_csv_filtered}" "{output.csv}"
+        mv {params.dlc_csv_filtered_glob} "{output.csv}"
         """
 
 rule upscale_dlc_csv:
