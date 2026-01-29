@@ -24,5 +24,6 @@ if __name__ == "__main__":
     deeplabcut.filterpredictions(
         args.config,
         args.video,
+        save_as_csv=True,
         destfolder=args.output_dir,
     )

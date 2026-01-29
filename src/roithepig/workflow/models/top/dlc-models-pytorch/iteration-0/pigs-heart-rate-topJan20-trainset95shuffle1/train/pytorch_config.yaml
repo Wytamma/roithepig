@@ -2,9 +2,6 @@ data:
   bbox_margin: 20
   colormode: RGB
   inference:
-    # resize:
-    #   width: 1296
-    #   height: 972
     normalize_images: true
     auto_padding:
       pad_width_divisor: 32
