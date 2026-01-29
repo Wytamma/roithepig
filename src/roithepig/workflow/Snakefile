@@ -87,7 +87,7 @@ rule deeplabcut:
         script    = SCRIPT_DIR / "run_deeplabcut.py",
     shell:
         r"""
-        set -euo pipefail
+        rm -f {params.dlc_csv_filtered_glob}
         python "{params.script}" \
             --video "{input.video}" \
             --config "{input.config}" \
