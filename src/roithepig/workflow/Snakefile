@@ -53,16 +53,14 @@ rule downscale_video:
         r"""
         factor="{params.factor}"
 
-        # If no scaling requested, link input to output
         if [ "$factor" = "1.0" ]; then
             ln -sf "{input.video}" "{output.video}"
             exit 0
         fi
 
-        # Perform scaling
         ffmpeg -y \
             -i "{input.video}" \
-            -vf "scale=iw*$factor:ih*$factor:flags=area" \
+            -vf "scale=trunc(iw*{params.factor}/2)*2:trunc(ih*{params.factor}/2)*2:flags=area" \
             -c:v libx264 \
             -crf 23 \
             -preset veryfast \
