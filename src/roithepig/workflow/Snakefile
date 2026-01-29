@@ -46,7 +46,7 @@ rule downscale_video:
     input:
         video=lambda wildcards: Path(config["video"]).resolve()
     output:
-        video=SCALED_VIDEO
+        video=temp(SCALED_VIDEO)
     params:
         factor=DOWNSCALE
     shell:
