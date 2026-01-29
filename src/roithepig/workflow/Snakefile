@@ -88,6 +88,7 @@ rule deeplabcut:
     shell:
         r"""
         rm -f {params.dlc_csv_filtered_glob}
+        rm -f {params.dlc_csv_filtered_glob.with_suffix('.h5')}
         python "{params.script}" \
             --video "{input.video}" \
             --config "{input.config}" \
