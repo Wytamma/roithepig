@@ -56,11 +56,16 @@ rule downscale_video:
             exit 0
         fi
 
-        ffmpeg -y -i input.mp4 \
-          -vf "scale=iw*$factor:-2" \
-          -c:v libx264 -crf 23 -preset veryfast -pix_fmt yuv420p \
-          -an -fps_mode passthrough \
-          "{output.video}"
+        ffmpeg -y \
+            -vsync 0 \
+            -i "{input.video}" \
+            -vf "scale=iw*$factor:-2" \
+            -c:v libx264 \
+            -crf 23 \
+            -preset veryfast \
+            -pix_fmt yuv420p \
+            -an \
+            "{output.video}"
         """
 
 
