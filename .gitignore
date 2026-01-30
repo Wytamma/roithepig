@@ -2,3 +2,4 @@ src/roithepig/.conda
 .snakemake
 output
 .DS_Store
+config.updated.yaml

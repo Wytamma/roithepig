@@ -19,9 +19,6 @@ SCALED_VIDEO = OUT_DIR / VIDEO_NAME / f"{VIDEO_NAME}.ds.mp4"
 DLC_CSV_DOWNSCALED = OUT_DIR / VIDEO_NAME / f"{VIDEO_NAME}.downscaled.csv"  # temp
 DLC_CSV_RESCALED   = OUT_DIR / VIDEO_NAME / f"{VIDEO_NAME}.csv"             # final
 
-# if DOWNSCALE < 1.0 and DOWNSCALE > 0:
-#     if config.get("cropping"):
-#         config["cropping"] = ",".join(DOWNSCALE * int(c) for c in config["cropping"].split(','))
 
 rule all:
     """Run all steps in the workflow"""
@@ -59,15 +56,11 @@ rule downscale_video:
             exit 0
         fi
 
-        ffmpeg -y \
-            -i "{input.video}" \
-            -vf "scale=iw*$factor:-2" \
-            -c:v libx264 \
-            -crf 23 \
-            -preset veryfast \
-            -pix_fmt yuv420p \
-            -an \
-            "{output.video}"
+        ffmpeg -y -i input.mp4 \
+          -vf "scale=iw*$factor:-2" \
+          -c:v libx264 -crf 23 -preset veryfast -pix_fmt yuv420p \
+          -an -fps_mode passthrough \
+          "{output.video}"
         """
 
 
