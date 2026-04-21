@@ -15,7 +15,7 @@ VIDEO_NAME = VIDEO_PATH.stem
 DOWNSCALE = float(config.get("downscale_factor", 1.0))
 assert DOWNSCALE > 0.0, "downscale_factor must be > 0.0"
 assert DOWNSCALE <= 1.0, "downscale_factor must be <= 1.0"
-SCALED_VIDEO = OUT_DIR / VIDEO_NAME / f"{VIDEO_NAME}.mp4"
+SCALED_VIDEO = OUT_DIR / VIDEO_NAME / f"{VIDEO_NAME}.downscaled.mp4"
 DLC_CSV_DOWNSCALED = OUT_DIR / VIDEO_NAME / f"{VIDEO_NAME}.downscaled.csv"  # temp
 DLC_CSV_RESCALED   = OUT_DIR / VIDEO_NAME / f"{VIDEO_NAME}.csv"             # final
 
