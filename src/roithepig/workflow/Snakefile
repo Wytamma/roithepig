@@ -43,7 +43,7 @@ rule clean_video:
     input:
         video=lambda wildcards: Path(config["video"]).resolve()
     output:
-        video=temp(OUT_DIR / VIDEO_NAME / f"{VIDEO_NAME}.cleaned.mkv")
+        video=OUT_DIR / VIDEO_NAME / f"{VIDEO_NAME}.cleaned.mkv"
     conda: ENV_DIR / "ffmpeg.yaml"
     shell:
         r"""
@@ -57,8 +57,8 @@ rule clean_video:
             -i "{input.video}" \
             -fps_mode passthrough \
             -c:v libx264 \
-            -preset ultrafast \
-            -crf 18 \
+            -preset veryfast \
+            -crf 20 \
             -pix_fmt yuv420p \
             -an \
             "{output.video}"
