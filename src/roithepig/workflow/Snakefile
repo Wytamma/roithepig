@@ -38,10 +38,36 @@ rule update_config:
             --config-path "{input.config}"
         """
 
+rule clean_video:
+    """Clean the input video with ffmpeg to ensure compatibility with DLC"""
+    input:
+        video=lambda wildcards: Path(config["video"]).resolve()
+    output:
+        video=temp(OUT_DIR / VIDEO_NAME / f"{VIDEO_NAME}.cleaned.mkv")
+    conda: ENV_DIR / "ffmpeg.yaml"
+    shell:
+        r"""
+        ffmpeg -y \
+            -loglevel warning \
+            -stats \
+            -threads 0 \
+            -hwaccel none \
+            -fflags +discardcorrupt \
+            -err_detect ignore_err \
+            -i "{input.video}" \
+            -fps_mode passthrough \
+            -c:v libx264 \
+            -preset ultrafast \
+            -crf 18 \
+            -pix_fmt yuv420p \
+            -an \
+            "{output.video}"
+        """
+
 rule downscale_video:
     """Downscale the input video with ffmpeg for faster DLC inference"""
     input:
-        video=lambda wildcards: Path(config["video"]).resolve()
+        video=rules.clean_video.output.video
     output:
         video=temp(SCALED_VIDEO)
     params:
@@ -57,9 +83,9 @@ rule downscale_video:
         fi
 
         ffmpeg -y \
-            -vsync 0 \
             -i "{input.video}" \
             -vf "scale=iw*$factor:-2" \
+            -fps_mode passthrough \
             -c:v libx264 \
             -crf 23 \
             -preset veryfast \
@@ -123,7 +149,7 @@ rule crop_and_split:
     """Crop and split the video into segments based on detected ear positions"""
     input:
         csv   = rules.upscale_dlc_csv.output.csv_full,   # use rescaled CSV
-        video = config["video"],                          # original video for cropping
+        video = rules.clean_video.output.video,  # use cleaned video for cropping
     output:
         out_dir = directory(OUT_DIR / VIDEO_NAME / "segments"),
     params:
