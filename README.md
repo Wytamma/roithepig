@@ -117,3 +117,12 @@ hatch run types:check
 ## License
 
 `roithepig` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
+
+
+### Variable-frame-rate recordings and timestamp validation
+
+ROI segments preserve the source video's decoded presentation-time intervals instead of using a fixed OpenCV output FPS. This is important for recordings whose acquisition rate varies (for example, 16–20 FPS). Segments use timestamps relative to their first frame, and `segments/frame_timestamps.tsv` retains the original decoded timestamps with their source frame indices. `segments/segments.tsv` records each segment's source range and maximum measured relative timestamp error.
+
+The `crop_and_split` step decodes each segment after writing it and checks that all expected frames are present, the timestamp order is strictly increasing, and every relative presentation timestamp differs from the source by at most `--timestamp-tolerance-ms` (default 1 ms). The corresponding CLI configuration key is `timestamp_tolerance_ms`. A violation raises an error and fails the Snakemake job. DLC CSV row counts must match the cleaned video's decoded frame count; mismatches fail rather than silently truncating.
+
+This check compares against the cleaned video passed into segmentation. It cannot recover camera acquisition times that were lost before or during recording or previous transcoding. The composite `segment_grid.mp4` is a fixed-FPS visualization, not a timing-preserving scientific output. The source and cleaned video timestamps should be checked separately if absolute acquisition timing is required.
