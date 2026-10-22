@@ -40,6 +40,10 @@ cli:
     type: int
     help: Number of frames to process in a single batch.
     default: 2
+  timestamp_tolerance_ms:
+    type: float
+    help: Maximum allowed relative frame timestamp error after encoding, in milliseconds.
+    default: 1.0
   debug:
     type: bool
     help: Enable debug mode instead of cropping to roi.

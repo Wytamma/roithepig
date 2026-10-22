@@ -157,7 +157,8 @@ rule crop_and_split:
         threshold  = config.get("threshold", 0.6),
         min_frames = config.get("min_frames", 30),
         include_gap= config.get("include_gap", 1),
-        box        = config.get("box", 50),  # size of the crop box around the detected body part
+        box        = config.get("box", 50),
+        timestamp_tolerance_ms = config.get("timestamp_tolerance_ms", 1.0),  # size of the crop box around the detected body part
         debug      = "--debug-roi" if config.get("debug", False) else "",
         script     = SCRIPT_DIR / "crop_and_split.py",
     shell:
@@ -172,6 +173,7 @@ rule crop_and_split:
             --include-gap {params.include_gap} \
             {params.debug} \
             --box {params.box} \
+            --timestamp-tolerance-ms {params.timestamp_tolerance_ms} \
             --crop
         """
 
