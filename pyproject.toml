@@ -26,6 +26,7 @@ classifiers = [
 ]
 dependencies = [
   "snk-cli",
+  "av>=12",
   "deeplabcut>=3.0.0rc10"
 ]
 
