@@ -126,7 +126,12 @@ def main():
 
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    fps = cap.get(cv2.CAP_PROP_FPS) or 30.0
+
+    fps = float(cap.get(cv2.CAP_PROP_FPS))
+    if not np.isfinite(fps) or fps <= 0:
+        raise RuntimeError(f"Could not read a valid FPS from {args.video}")
+
+    print(f"Input FPS: {fps:.3f}")
     n_video = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) if cap.get(cv2.CAP_PROP_FRAME_COUNT) > 0 else len(df)
     max_idx = min(n_video, len(df)) - 1
     runs = [(max(0, s), min(e, max_idx)) for s, e in runs if s <= max_idx]
