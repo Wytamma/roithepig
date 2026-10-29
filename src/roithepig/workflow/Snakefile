@@ -56,6 +56,7 @@ rule clean_video:
             -err_detect ignore_err \
             -i "{input.video}" \
             -fps_mode passthrough \
+            -enc_time_base:v 1:1000000 \
             -c:v libx264 \
             -preset veryfast \
             -crf 20 \
@@ -86,6 +87,7 @@ rule downscale_video:
             -i "{input.video}" \
             -vf "scale=iw*$factor:-2" \
             -fps_mode passthrough \
+            -enc_time_base:v 1:1000000 \
             -c:v libx264 \
             -crf 23 \
             -preset veryfast \
