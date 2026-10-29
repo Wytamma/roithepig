@@ -51,3 +51,33 @@ def validate_timestamps(source_times: Sequence[float], output_times: Sequence[fl
             f"tolerance {tolerance_seconds:.6f}s"
         )
     return TimestampValidation(len(expected), error, source_relative[-1], output_relative[-1])
+
+
+def repair_timestamp_collisions(times, *, tolerance_seconds=0.001,
+                                tick_seconds=0.000001):
+    """Repair small timestamp collisions without inventing frame-rate intervals.
+
+    Returns (repaired, corrections). Every correction is limited by the
+    tolerance relative to the original timestamp, including accumulated drift.
+    These are encoding-time repairs, not recovered camera acquisition times.
+    """
+    if not math.isfinite(tolerance_seconds) or tolerance_seconds < 0:
+        raise ValueError("Tolerance must be finite and nonnegative")
+    if not math.isfinite(tick_seconds) or tick_seconds <= 0:
+        raise ValueError("tick_seconds must be positive and finite")
+    if any(not math.isfinite(t) for t in times):
+        raise ValueError("Nonfinite source timestamp")
+    repaired, corrections = [], []
+    for idx, original in enumerate(times):
+        adjusted = original
+        if repaired and original <= repaired[-1]:
+            adjusted = repaired[-1] + tick_seconds
+            if adjusted - original > tolerance_seconds + 1e-12:
+                raise ValueError(
+                    f"Timestamp anomaly at frame {idx}: source={original:.9f}s, "
+                    f"required={adjusted:.9f}s, exceeds "
+                    f"{tolerance_seconds * 1000:.3f}ms repair limit"
+                )
+            corrections.append((idx, original, adjusted))
+        repaired.append(adjusted)
+    return repaired, corrections
