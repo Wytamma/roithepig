@@ -4,6 +4,10 @@ from pathlib import Path
 import cv2
 import numpy as np
 import pandas as pd
+import av
+from fractions import Fraction
+from timestamp_validation import (read_presentation_times, validate_timestamps,
+                                  repair_timestamp_collisions)
 
 
 def collect_bodypart_triplets(df: pd.DataFrame, bodypart: str):
@@ -88,6 +92,8 @@ def main():
     p.add_argument("--box", type=int, default=128, help="Square crop size in pixels.")
     p.add_argument("--debug-roi", action="store_true",
                    help="Draw ROI rectangle and center dot on full frame (overrides --crop).")
+    p.add_argument("--timestamp-tolerance-ms", type=float, default=1.0,
+                   help="Maximum allowed source/output relative timestamp difference in milliseconds.")
     args = p.parse_args()
 
     # Validation
@@ -99,6 +105,8 @@ def main():
         raise ValueError("--box must be > 0")
     if args.include_gap < 0:
         raise ValueError("--include-gap must be >= 0")
+    if not np.isfinite(args.timestamp_tolerance_ms) or args.timestamp_tolerance_ms < 0:
+        raise ValueError("--timestamp-tolerance-ms must be finite and >= 0")
 
     outdir = args.out.resolve()
     outdir.mkdir(parents=True, exist_ok=True)
@@ -119,121 +127,153 @@ def main():
         print("No segments met the condition; nothing to write.")
         return
 
-    # Video IO
-    cap = cv2.VideoCapture(str(args.video))
-    if not cap.isOpened():
-        raise RuntimeError(f"Could not open video: {args.video}")
+    # Decode presentation-order frames and preserve their source PTS intervals.
+    source_times = read_presentation_times(args.video)
+    if len(source_times) != len(df):
+        raise ValueError(
+            f"DLC/video frame mismatch: {len(df)} CSV rows vs "
+            f"{len(source_times)} decoded video frames"
+        )
+    # Keep both the original decoded PTS and bounded, monotonic encoding PTS.
+    encoded_times, corrections = repair_timestamp_collisions(
+        source_times, tolerance_seconds=args.timestamp_tolerance_ms / 1000.0
+    )
+    if corrections:
+        print(f"WARNING: corrected {len(corrections)} source timestamp collisions "
+              f"(<= {args.timestamp_tolerance_ms} ms per frame). "
+              "These adjustments do not recover acquisition timing.")
 
-    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    manifest = [
+        "segment_index\tstart_frame\tend_frame\tfile\t"
+        "source_start_time_s\tsource_end_time_s\tmax_timestamp_error_s"
+    ]
+    frame_manifest = [
+        "segment_index\tsegment_frame\tsource_frame\t"
+        "source_time_s\tsegment_time_s\ttimestamp_correction_s"
+    ]
+    time_base = Fraction(1, 1000000)
+    stem = args.video.stem
+    written = 0
 
-    fps = float(cap.get(cv2.CAP_PROP_FPS))
-    if not np.isfinite(fps) or fps <= 0:
-        raise RuntimeError(f"Could not read a valid FPS from {args.video}")
+    with av.open(str(args.video)) as source:
+        stream = source.streams.video[0]
+        width = stream.codec_context.width
+        height = stream.codec_context.height
+        do_crop = args.crop and not args.debug_roi
+        crop_size = min(max(8, args.box), width, height)
+        if do_crop:
+            # yuv420p requires even dimensions.
+            crop_size -= crop_size % 2
+            if crop_size < 2:
+                raise ValueError("Video too small for yuv420p cropping")
+        elif width % 2 or height % 2:
+            raise ValueError("Full-frame H.264 output requires even dimensions")
+        out_size = (crop_size, crop_size) if do_crop else (width, height)
 
-    print(f"Input FPS: {fps:.3f}")
-    n_video = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) if cap.get(cv2.CAP_PROP_FRAME_COUNT) > 0 else len(df)
-    max_idx = min(n_video, len(df)) - 1
-    runs = [(max(0, s), min(e, max_idx)) for s, e in runs if s <= max_idx]
-
-    # Output shape and mode
-    crop_size = max(8, min(int(args.box), width, height))
-    do_crop = args.crop and not args.debug_roi
-    out_size = (crop_size, crop_size) if do_crop else (width, height)
-
-    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-    stem = Path(args.video).stem
-    manifest = ["segment_index\tstart_frame\tend_frame\tfile"]
-
-    run_i = 0
-    writer = None
-    current_end = -1
-    frame_idx = 0
-    next_start = runs[run_i][0] if run_i < len(runs) else None
-
-    # Per-segment last-good center for gap frames or NaNs
-    last_cx = None
-    last_cy = None
-
-    while True:
-        ok, frame = cap.read()
-        if not ok or frame_idx > max_idx:
-            break
-
-        # Advance to next run if past current
-        while next_start is not None and frame_idx > runs[run_i][1]:
-            if writer is not None:
-                writer.release()
-                writer = None
-            run_i += 1
-            next_start = runs[run_i][0] if run_i < len(runs) else None
-            last_cx = last_cy = None  # reset per segment
-
-        # Start new segment
-        if next_start is not None and frame_idx == next_start:
-            seg_idx = run_i + 1
+        frame_iterator = enumerate(source.decode(video=0))
+        current_idx = -1
+        for seg_idx, (start, end) in enumerate(runs, 1):
             out_path = outdir / f"{stem}_seg{seg_idx:03d}.mp4"
-            writer = cv2.VideoWriter(str(out_path), fourcc, fps, out_size)
-            if not writer.isOpened():
-                cap.release()
-                raise RuntimeError(f"Could not open output for writing: {out_path}")
-            current_end = runs[run_i][1]
-            manifest.append(f"{seg_idx}\t{frame_idx}\t{current_end}\t{out_path}")
+            segment_origin = encoded_times[start]
+            last_cx = last_cy = None
+            output_pts = []
+            with av.open(str(out_path), mode="w") as target:
+                encoder = target.add_stream("libx264", rate=20)
+                encoder.width, encoder.height = out_size
+                encoder.pix_fmt = "yuv420p"
+                encoder.codec_context.time_base = time_base
+                encoder.time_base = time_base
+                encoder.options = {"crf": "18", "preset": "medium", "bf": "0"}
 
-        if writer is not None:
-            # Use coords even inside included gaps.
-            x = cx[frame_idx]
-            y = cy[frame_idx]
-            if np.isfinite(x) and np.isfinite(y):
-                last_cx, last_cy = float(x), float(y)
-            # Fallback in gap frames with NaN:
-            if last_cx is None or last_cy is None:
-                last_cx = width / 2.0
-                last_cy = height / 2.0
+                for frame_idx in range(start, end + 1):
+                    while current_idx < frame_idx:
+                        try:
+                            current_idx, frame = next(frame_iterator)
+                        except StopIteration:
+                            raise ValueError(
+                                f"Video ended before source frame {frame_idx}"
+                            ) from None
+                    image = frame.to_ndarray(format="bgr24")
+                    x, y = cx[frame_idx], cy[frame_idx]
+                    if np.isfinite(x) and np.isfinite(y):
+                        last_cx, last_cy = float(x), float(y)
+                    if last_cx is None:
+                        last_cx, last_cy = width / 2.0, height / 2.0
 
-            half = crop_size // 2
-            left = int(round(last_cx)) - half
-            top = int(round(last_cy)) - half
-            left = clamp_int(left, 0, max(0, width - crop_size))
-            top = clamp_int(top, 0, max(0, height - crop_size))
-
-            if do_crop:
-                roi = frame[top: top + crop_size, left: left + crop_size]
-                if roi.shape[0] != crop_size or roi.shape[1] != crop_size:
-                    roi = cv2.copyMakeBorder(
-                        roi,
-                        top=0, bottom=crop_size - roi.shape[0],
-                        left=0, right=crop_size - roi.shape[1],
-                        borderType=cv2.BORDER_REPLICATE,
+                    left = clamp_int(
+                        int(round(last_cx)) - crop_size // 2,
+                        0, width - crop_size
                     )
-                writer.write(roi)
-            else:
-                if args.debug_roi:
-                    cv2.rectangle(frame, (left, top), (left + crop_size, top + crop_size), (0, 255, 0), 2)
-                    cv2.circle(frame, (int(round(last_cx)), int(round(last_cy))), 3, (0, 0, 255), -1)
-                    # Lightweight label
-                    cv2.putText(
-                        frame, f"f={frame_idx}",
-                        (left, max(0, top - 6)),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1, cv2.LINE_AA
+                    top = clamp_int(
+                        int(round(last_cy)) - crop_size // 2,
+                        0, height - crop_size
                     )
-                writer.write(frame)
+                    if do_crop:
+                        image = image[top:top + crop_size, left:left + crop_size]
+                    elif args.debug_roi:
+                        cv2.rectangle(
+                            image, (left, top),
+                            (left + crop_size, top + crop_size), (0, 255, 0), 2
+                        )
+                        cv2.circle(
+                            image, (round(last_cx), round(last_cy)),
+                            3, (0, 0, 255), -1
+                        )
+                        cv2.putText(
+                            image, f"f={frame_idx}", (left, max(0, top - 6)),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.4,
+                            (255, 255, 255), 1, cv2.LINE_AA
+                        )
 
-            if frame_idx == current_end:
-                writer.release()
-                writer = None
-                last_cx = last_cy = None
+                    pts = round((encoded_times[frame_idx] - segment_origin) * 1000000)
+                    if output_pts and pts <= output_pts[-1]:
+                        raise ValueError(
+                            f"Timestamp precision collision at frame {frame_idx}"
+                        )
+                    output_pts.append(pts)
+                    encoded = av.VideoFrame.from_ndarray(image, format="bgr24")
+                    encoded.pts = pts
+                    encoded.time_base = time_base
+                    for packet in encoder.encode(encoded):
+                        target.mux(packet)
+                    frame_manifest.append(
+                        f"{seg_idx}\t{frame_idx - start}\t{frame_idx}\t"
+                        f"{source_times[frame_idx]:.9f}\t{pts / 1e6:.9f}\t"
+                        f"{encoded_times[frame_idx] - source_times[frame_idx]:.9f}"
+                    )
+                for packet in encoder.encode():
+                    target.mux(packet)
 
-        frame_idx += 1
+            # Decode the actual encoded output: encoder metadata alone is not proof.
+            actual_times = read_presentation_times(out_path)
+            validation = validate_timestamps(
+                encoded_times, actual_times, start_frame=start, end_frame=end,
+                tolerance_seconds=args.timestamp_tolerance_ms / 1000.0
+            )
+            manifest.append(
+                f"{seg_idx}\t{start}\t{end}\t{out_path}\t"
+                f"{source_times[start]:.9f}\t{source_times[end]:.9f}\t"
+                f"{validation.max_error_seconds:.9f}"
+            )
+            written += 1
+            print(f"Validated segment {seg_idx}: "
+                  f"{validation.frames} frames, max error "
+                  f"{validation.max_error_seconds * 1000:.3f} ms")
 
-    if writer is not None:
-        writer.release()
-    cap.release()
-
+    (outdir / "timestamp_corrections.tsv").write_text(
+        "source_frame\toriginal_time_s\trepaired_time_s\tcorrection_s\n" +
+        "".join(f"{idx}\t{original:.9f}\t{adjusted:.9f}\t"
+                f"{adjusted - original:.9f}\n"
+                for idx, original, adjusted in corrections),
+        encoding="utf-8"
+    )
+    (outdir / "frame_timestamps.tsv").write_text(
+        "\n".join(frame_manifest) + "\n", encoding="utf-8"
+    )
     manifest_path = outdir / "segments.tsv"
     with manifest_path.open("w", encoding="utf-8") as f:
         f.write("\n".join(manifest) + "\n")
-    print(f"Wrote {len(runs)} segment(s). Manifest: {manifest_path}")
+    print(f"Wrote {written} validated segment(s). Manifest: {manifest_path}")
 
 
 if __name__ == "__main__":

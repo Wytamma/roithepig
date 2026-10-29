@@ -23,7 +23,7 @@ DLC_CSV_RESCALED   = OUT_DIR / VIDEO_NAME / f"{VIDEO_NAME}.csv"             # fi
 rule all:
     """Run all steps in the workflow"""
     input:
-        OUT_DIR / VIDEO_NAME / "segment_grid.mp4"
+        OUT_DIR / VIDEO_NAME / "segment_grid.done"
 
 rule update_config:
     input:
@@ -56,6 +56,7 @@ rule clean_video:
             -err_detect ignore_err \
             -i "{input.video}" \
             -fps_mode passthrough \
+            -enc_time_base:v 1:1000000 \
             -c:v libx264 \
             -preset veryfast \
             -crf 20 \
@@ -86,6 +87,7 @@ rule downscale_video:
             -i "{input.video}" \
             -vf "scale=iw*$factor:-2" \
             -fps_mode passthrough \
+            -enc_time_base:v 1:1000000 \
             -c:v libx264 \
             -crf 23 \
             -preset veryfast \
@@ -157,7 +159,8 @@ rule crop_and_split:
         threshold  = config.get("threshold", 0.6),
         min_frames = config.get("min_frames", 30),
         include_gap= config.get("include_gap", 1),
-        box        = config.get("box", 50),  # size of the crop box around the detected body part
+        box        = config.get("box", 50),
+        timestamp_tolerance_ms = config.get("timestamp_tolerance_ms", 1.0),  # size of the crop box around the detected body part
         debug      = "--debug-roi" if config.get("debug", False) else "",
         script     = SCRIPT_DIR / "crop_and_split.py",
     shell:
@@ -172,6 +175,7 @@ rule crop_and_split:
             --include-gap {params.include_gap} \
             {params.debug} \
             --box {params.box} \
+            --timestamp-tolerance-ms {params.timestamp_tolerance_ms} \
             --crop
         """
 
@@ -180,18 +184,20 @@ rule create_segment_grid:
     input:
         segments = rules.crop_and_split.output.out_dir,
     output:
-        grid = OUT_DIR / VIDEO_NAME / "segment_grid.mp4",
+        flag = OUT_DIR / VIDEO_NAME / "segment_grid.done",
     params:
         cell="320x320",
         fps=24,
         cols=0,   # 0 means auto
         script = SCRIPT_DIR / "create_segment_grid.py",
+        grid = OUT_DIR / VIDEO_NAME / "segment_grid.mp4",
     shell:
         r"""
         python "{params.script}" \
             --segments "{input.segments}" \
-            --out "{output.grid}" \
+            --out "{params.grid}" \
             --cell {params.cell} \
             --fps {params.fps} \
             --cols {params.cols}
+        touch "{output.flag}"
         """
