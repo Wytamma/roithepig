@@ -7,6 +7,7 @@ cli:
       - top
   bodypart:
     type: str
+    required: true
     help: Body part to focus on for cropping.
   video:
     type: path

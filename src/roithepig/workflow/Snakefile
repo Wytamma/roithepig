@@ -23,7 +23,7 @@ DLC_CSV_RESCALED   = OUT_DIR / VIDEO_NAME / f"{VIDEO_NAME}.csv"             # fi
 rule all:
     """Run all steps in the workflow"""
     input:
-        OUT_DIR / VIDEO_NAME / "segment_grid.mp4"
+        OUT_DIR / VIDEO_NAME / "segment_grid.done"
 
 rule update_config:
     input:
@@ -182,18 +182,20 @@ rule create_segment_grid:
     input:
         segments = rules.crop_and_split.output.out_dir,
     output:
-        grid = OUT_DIR / VIDEO_NAME / "segment_grid.mp4",
+        flag = OUT_DIR / VIDEO_NAME / "segment_grid.done",
     params:
         cell="320x320",
         fps=24,
         cols=0,   # 0 means auto
         script = SCRIPT_DIR / "create_segment_grid.py",
+        grid = OUT_DIR / VIDEO_NAME / "segment_grid.mp4",
     shell:
         r"""
         python "{params.script}" \
             --segments "{input.segments}" \
-            --out "{output.grid}" \
+            --out "{params.grid}" \
             --cell {params.cell} \
             --fps {params.fps} \
             --cols {params.cols}
+        touch "{output.flag}"
         """
