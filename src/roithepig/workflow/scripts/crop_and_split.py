@@ -6,7 +6,8 @@ import numpy as np
 import pandas as pd
 import av
 from fractions import Fraction
-from timestamp_validation import read_presentation_times, validate_timestamps
+from timestamp_validation import (read_presentation_times, validate_timestamps,
+                                  repair_timestamp_collisions)
 
 
 def collect_bodypart_triplets(df: pd.DataFrame, bodypart: str):
@@ -133,8 +134,14 @@ def main():
             f"DLC/video frame mismatch: {len(df)} CSV rows vs "
             f"{len(source_times)} decoded video frames"
         )
-    if any(b <= a for a, b in zip(source_times, source_times[1:])):
-        raise ValueError("Source video timestamps must be strictly increasing")
+    # Keep both the original decoded PTS and bounded, monotonic encoding PTS.
+    encoded_times, corrections = repair_timestamp_collisions(
+        source_times, tolerance_seconds=args.timestamp_tolerance_ms / 1000.0
+    )
+    if corrections:
+        print(f"WARNING: corrected {len(corrections)} source timestamp collisions "
+              f"(<= {args.timestamp_tolerance_ms} ms per frame). "
+              "These adjustments do not recover acquisition timing.")
 
     manifest = [
         "segment_index\tstart_frame\tend_frame\tfile\t"
@@ -142,7 +149,7 @@ def main():
     ]
     frame_manifest = [
         "segment_index\tsegment_frame\tsource_frame\t"
-        "source_time_s\tsegment_time_s"
+        "source_time_s\tsegment_time_s\ttimestamp_correction_s"
     ]
     time_base = Fraction(1, 1000000)
     stem = args.video.stem
@@ -167,7 +174,7 @@ def main():
         current_idx = -1
         for seg_idx, (start, end) in enumerate(runs, 1):
             out_path = outdir / f"{stem}_seg{seg_idx:03d}.mp4"
-            segment_origin = source_times[start]
+            segment_origin = encoded_times[start]
             last_cx = last_cy = None
             output_pts = []
             with av.open(str(out_path), mode="w") as target:
@@ -218,7 +225,7 @@ def main():
                             (255, 255, 255), 1, cv2.LINE_AA
                         )
 
-                    pts = round((source_times[frame_idx] - segment_origin) * 1000000)
+                    pts = round((encoded_times[frame_idx] - segment_origin) * 1000000)
                     if output_pts and pts <= output_pts[-1]:
                         raise ValueError(
                             f"Timestamp precision collision at frame {frame_idx}"
@@ -231,7 +238,8 @@ def main():
                         target.mux(packet)
                     frame_manifest.append(
                         f"{seg_idx}\t{frame_idx - start}\t{frame_idx}\t"
-                        f"{source_times[frame_idx]:.9f}\t{pts / 1e6:.9f}"
+                        f"{source_times[frame_idx]:.9f}\t{pts / 1e6:.9f}\t"
+                        f"{encoded_times[frame_idx] - source_times[frame_idx]:.9f}"
                     )
                 for packet in encoder.encode():
                     target.mux(packet)
@@ -239,7 +247,7 @@ def main():
             # Decode the actual encoded output: encoder metadata alone is not proof.
             actual_times = read_presentation_times(out_path)
             validation = validate_timestamps(
-                source_times, actual_times, start_frame=start, end_frame=end,
+                encoded_times, actual_times, start_frame=start, end_frame=end,
                 tolerance_seconds=args.timestamp_tolerance_ms / 1000.0
             )
             manifest.append(
@@ -252,6 +260,13 @@ def main():
                   f"{validation.frames} frames, max error "
                   f"{validation.max_error_seconds * 1000:.3f} ms")
 
+    (outdir / "timestamp_corrections.tsv").write_text(
+        "source_frame\toriginal_time_s\trepaired_time_s\tcorrection_s\n" +
+        "".join(f"{idx}\t{original:.9f}\t{adjusted:.9f}\t"
+                f"{adjusted - original:.9f}\n"
+                for idx, original, adjusted in corrections),
+        encoding="utf-8"
+    )
     (outdir / "frame_timestamps.tsv").write_text(
         "\n".join(frame_manifest) + "\n", encoding="utf-8"
     )
